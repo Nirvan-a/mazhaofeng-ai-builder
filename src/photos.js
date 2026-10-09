@@ -11,13 +11,23 @@ export const scenes = {
   architecture: `${storage}/1878582012815395.webp`,
 };
 
+export const clientLogos = {
+  sonabel: `${storage}/1878596284398682.png`,
+  saudiEnergy: `${storage}/1878596357503072.png`,
+  chinaCopper: `${storage}/1878596357503088.png`,
+  fotile: `${storage}/1878596308437018.png`,
+  luckin: `${storage}/1878596167902297.png`,
+  saic: `${storage}/1878596308437034.png`,
+  envision: `${storage}/1878596352360681.png`,
+};
+
 export const lifePhotos = [
   { src: `${storage}/1878591963399355.webp`, fullSrc: `${storage}/1878590728992793.webp`, alt: '山水之间', meta: 'BY THE WATER', aspectRatio: 3 / 2 },
-  { src: `${storage}/1878591963400331.webp`, fullSrc: `${storage}/1878590728992777.webp`, alt: '夜樱与街巷', meta: 'AFTER DARK', aspectRatio: 4 / 3 },
   { src: `${storage}/1878591961876571.webp`, fullSrc: `${storage}/1878590903932969.webp`, alt: '西非街头', meta: 'ON THE ROAD', aspectRatio: 4 / 3 },
-  { src: `${storage}/1878591963400347.webp`, fullSrc: `${storage}/1878590903932985.webp`, alt: '沙丁风暴', meta: 'UNDER THE SURFACE', aspectRatio: 4 / 3 },
   { src: `${storage}/1878591969445961.webp`, fullSrc: `${storage}/1878590887846075.webp`, alt: '城市俯瞰', meta: 'RIYADH', aspectRatio: 4 / 3 },
-  { src: `${storage}/1878591961876555.webp`, fullSrc: `${storage}/1878590887846059.webp`, alt: '围坐的一餐', meta: 'AT THE TABLE', aspectRatio: 4 / 3 },
   { src: `${storage}/1878591973016649.webp`, fullSrc: `${storage}/1878590728992809.webp`, alt: '射击体验', meta: 'OFF DUTY', aspectRatio: 2400 / 1351 },
   { src: `${storage}/1878591971829978.webp`, fullSrc: `${storage}/1878590728993865.webp`, alt: '豆包即猫', meta: 'DOUBAO & CAT', aspectRatio: 2400 / 1553 },
+  { src: `${storage}/1878591961876555.webp`, fullSrc: `${storage}/1878590887846059.webp`, alt: '围坐的一餐', meta: 'AT THE TABLE', aspectRatio: 4 / 3 },
+  { src: `${storage}/1878591963400331.webp`, fullSrc: `${storage}/1878590728992777.webp`, alt: '夜樱与街巷', meta: 'AFTER DARK', aspectRatio: 4 / 3 },
+  { src: `${storage}/1878591963400347.webp`, fullSrc: `${storage}/1878590903932985.webp`, alt: '沙丁风暴', meta: 'UNDER THE SURFACE', aspectRatio: 4 / 3 },
 ];

@@ -25,7 +25,10 @@ export function renderLife(photos) {
         <p class="life-kicker"><span class="life-chapter">04</span><span>OFF THE CLOCK</span></p>
         <div class="life-heading-row">
           <h2 id="life-title">生活，不只一种现场</h2>
-          <p class="life-intro">一些日常，一些好奇心。</p>
+          <p class="life-intro">
+            <span>一些日常，</span>
+            <span>一些好奇<span class="life-intro-dot">。</span></span>
+          </p>
         </div>
       </div>
       ${items.length ? `
@@ -57,10 +60,11 @@ export function renderLife(photos) {
       ${items.length ? `
         <dialog class="life-lightbox" aria-label="图片预览">
           <div class="life-lightbox-shell">
-            <button class="life-lightbox-close" type="button" data-life-close autofocus aria-label="关闭大图">
+            <button class="life-lightbox-close" type="button" data-life-close aria-label="关闭大图">
               <span aria-hidden="true">×</span>
             </button>
-            <img class="life-lightbox-image" data-life-full alt="" decoding="async" />
+            <img class="life-lightbox-preview" data-life-preview alt="" decoding="async" />
+            <img class="life-lightbox-image" data-life-full alt="" decoding="async" fetchpriority="high" />
           </div>
         </dialog>` : ''}
     </section>`;
@@ -79,6 +83,7 @@ export function initLife(photos) {
   const original = root.querySelector('[data-life-original]');
   const originals = [...original.querySelectorAll('.life-photo')];
   const dialog = root.querySelector('.life-lightbox');
+  const previewImage = dialog.querySelector('[data-life-preview]');
   const fullImage = dialog.querySelector('[data-life-full]');
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const controller = new AbortController();
@@ -96,6 +101,7 @@ export function initLife(photos) {
   let pointer = null;
   let suppressClickUntil = 0;
   let current = 0;
+  let imageRequest = 0;
   let lastTrigger = null;
   let reelSnapshot = 0;
   let bodySnapshot = null;
@@ -224,16 +230,21 @@ export function initLife(photos) {
   function showPhoto(index) {
     current = modulo(index, items.length);
     const photo = items[current];
-    fullImage.src = photo.src;
+    const request = ++imageRequest;
+    fullImage.classList.remove('is-ready');
+    previewImage.src = photo.src;
+    previewImage.alt = photo.alt;
+    fullImage.src = photo.fullSrc;
     fullImage.alt = photo.alt;
-    if (photo.fullSrc !== photo.src) {
-      const intended = photo.fullSrc;
-      const highResolution = new Image();
-      highResolution.onload = () => {
-        if (dialog.open && items[current].fullSrc === intended) fullImage.src = intended;
-      };
-      highResolution.src = intended;
-    }
+    const reveal = () => {
+      if (request === imageRequest && items[current] === photo && fullImage.naturalWidth) {
+        fullImage.classList.add('is-ready');
+      }
+    };
+    fullImage.decode().then(reveal).catch(() => {
+      if (fullImage.complete) reveal();
+      else fullImage.addEventListener('load', reveal, { once: true });
+    });
   }
 
   function openPhoto(index) {
@@ -254,6 +265,10 @@ export function initLife(photos) {
   }
 
   function finishDialog() {
+    imageRequest += 1;
+    fullImage.classList.remove('is-ready');
+    fullImage.removeAttribute('src');
+    previewImage.removeAttribute('src');
     unlockBody();
     if (!disposed && lastTrigger?.isConnected) lastTrigger.focus({ preventScroll: true });
     reel.scrollLeft = reelSnapshot;

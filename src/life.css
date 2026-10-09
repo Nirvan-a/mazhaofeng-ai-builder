@@ -62,12 +62,18 @@ section#life.life {
 }
 #life.life .life-intro {
   flex-shrink: 0;
+  display: grid;
+  gap: 1px;
   margin: 0;
-  color: var(--life-muted);
-  font-size: 12px;
-  line-height: 1.6;
-  letter-spacing: .06em;
+  padding: 0 2em 0 12px;
+  border-left: 1px solid var(--red, #d71920);
+  color: #5f5c56;
+  font: 400 11px/1.65 "Songti SC", var(--serif, serif);
+  letter-spacing: .16em;
+  white-space: nowrap;
 }
+#life.life .life-intro > span:last-child { transform: translateX(2em); }
+#life.life .life-intro-dot { color: var(--red, #d71920); }
 
 #life.life .life-reel {
   position: relative;
@@ -120,7 +126,7 @@ section#life.life {
   overflow: hidden;
   border: 0;
   border-radius: 0;
-  background: #e8e6e0;
+  background: #dcd8cf;
   color: inherit;
   cursor: zoom-in;
   appearance: none;
@@ -133,11 +139,13 @@ section#life.life {
   height: 100%;
   max-width: none;
   object-fit: contain;
+  filter: saturate(.78) contrast(.96) brightness(.94);
   opacity: 0;
-  transition: opacity .35s ease;
+  transition: opacity .35s ease, filter .45s ease;
   pointer-events: none;
 }
 #life.life .life-photo img.is-loaded { opacity: 1; }
+#life.life .life-photo:hover img { filter: saturate(.96) contrast(1) brightness(.98); }
 #life.life .life-caption {
   display: flex;
   align-items: center;
@@ -224,6 +232,7 @@ section#life.life {
 #life.life .life-lightbox::backdrop { background: rgb(0 0 0 / 86%); }
 #life.life .life-lightbox-shell {
   position: relative;
+  display: grid;
   height: 100%;
   padding: 12px;
 }
@@ -246,13 +255,18 @@ section#life.life {
   cursor: pointer;
 }
 #life.life .life-lightbox-close:hover { color: var(--red, #d71920); }
-#life.life .life-lightbox-image { width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+#life.life .life-lightbox-close:focus-visible { outline: 0; color: var(--red, #d71920); }
+#life.life :is(.life-lightbox-preview, .life-lightbox-image) { grid-area: 1 / 1; width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+#life.life .life-lightbox-preview { opacity: 1; }
+#life.life .life-lightbox-image { opacity: 0; transition: opacity .16s ease; }
+#life.life .life-lightbox-image.is-ready { opacity: 1; }
 
 @media (max-width: 700px) {
   section#life.life { padding-top: calc(var(--header-h, 64px) + 20px); --life-caption-height: 26px; }
   #life.life .life-kicker { gap: 14px; font-size: 9px; }
   #life.life #life-title { font-size: clamp(27px, 8vw, 34px); }
-  #life.life .life-intro { display: none; }
+  #life.life .life-heading-row { flex-direction: column; align-items: stretch; gap: 8px; }
+  #life.life .life-intro { align-self: flex-end; font-size: 10px; }
   #life.life .life-outro { grid-column: 1; font-size: clamp(32px, 9.3vw, 60px); }
   #life.life .life-colophon { grid-column: 1; grid-row: 2; flex-wrap: wrap; gap: 0 18px; font-size: 9px; }
   #life.life .life-signature { width: 100%; }

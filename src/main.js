@@ -1,16 +1,16 @@
 import './styles.css';
-import { scenes, lifePhotos } from './photos.js';
+import { clientLogos, scenes, lifePhotos } from './photos.js';
 import { renderLife, initLife } from './life.js';
 
 const clients = [
-  { name: '布基纳法索电力公司', mark: 'SONABEL', brand: 'sonabel' },
-  { name: '沙特电力公司', mark: 'Saudi Energy', brand: 'saudi-energy' },
-  { name: '中国铜业集团', mark: 'China Copper', brand: 'china-copper' },
-  { name: '方太集团', mark: 'FOTILE', brand: 'fotile' },
-  { name: '瑞幸咖啡', mark: 'luckin coffee', brand: 'luckin' },
-  { name: '上汽集团', mark: 'SAIC MOTOR', brand: 'saic' },
-  { name: '远景能源', mark: 'Envision Energy', brand: 'envision' },
-  { name: '某军工集团', mark: 'CONFIDENTIAL', brand: 'confidential' },
+  { name: '布基纳法索电力公司', logo: clientLogos.sonabel, brand: 'sonabel', width: 152, height: 88 },
+  { name: '沙特电力公司', logo: clientLogos.saudiEnergy, brand: 'saudi-energy', width: 135, height: 88 },
+  { name: '中国铜业有限公司', logo: clientLogos.chinaCopper, brand: 'china-copper', width: 457, height: 88 },
+  { name: '方太集团', logo: clientLogos.fotile, brand: 'fotile', width: 193, height: 56 },
+  { name: '瑞幸咖啡', logo: clientLogos.luckin, brand: 'luckin', width: 333, height: 88 },
+  { name: '上汽集团', logo: clientLogos.saic, brand: 'saic', width: 55, height: 55 },
+  { name: '远景能源', logo: clientLogos.envision, brand: 'envision', width: 111, height: 29 },
+  { name: '某军工集团', brand: 'confidential' },
 ];
 
 const steps = [
@@ -22,9 +22,13 @@ const steps = [
 
 const clientGroup = (items, duplicate = false) => `
   <div class="client-group" ${duplicate ? 'aria-hidden="true" inert' : ''}>
-    ${items.map(({ name, mark, brand }) => `
+    ${items.map(({ name, logo, brand, width, height }) => `
       <span class="client-item">
-        <span class="client-mark client-mark-${brand}" aria-hidden="true">${mark}</span>
+        <span class="client-mark client-mark-${brand}" aria-hidden="true">
+          ${logo
+    ? `<img src="${logo}" alt="" width="${width}" height="${height}" decoding="async" />`
+    : '<span class="client-confidential">保密</span>'}
+        </span>
         <span class="client-name">${name}</span>
       </span><i aria-hidden="true"></i>`).join('')}
   </div>`;
@@ -235,6 +239,10 @@ let framePending = false;
 let snapTimer = 0;
 let snapReleaseTimer = 0;
 let snapping = false;
+let scrollDirection = 1;
+let directionSampleY = scrollY;
+let snapTargetY = scrollY;
+const supportsScrollEnd = 'onscrollend' in window;
 function updateNavigation() {
   framePending = false;
   header.classList.toggle('scrolled', scrollY > 64);
@@ -250,25 +258,38 @@ function updateNavigation() {
 
 function releaseThresholdSnap() {
   snapping = false;
+  directionSampleY = scrollY;
   clearTimeout(snapReleaseTimer);
 }
 
 function snapAtThreshold() {
   snapTimer = 0;
   if (snapping || document.querySelector('.life-lightbox[open]')) return;
-  const currentIndex = sections.reduce((index, section, candidate) =>
-    section.offsetTop <= scrollY + 2 ? candidate : index, 0);
-  const current = sections[currentIndex];
-  const next = sections[currentIndex + 1];
-  let target = current;
-  if (next) {
-    const bounds = next.getBoundingClientRect();
-    const visible = Math.max(0, Math.min(bounds.height, innerHeight - Math.max(0, bounds.top)));
-    if (visible / bounds.height > .3) target = next;
+  const position = scrollY;
+  let target;
+  if (scrollDirection < 0) {
+    const currentIndex = sections.findIndex((section) => section.offsetTop >= position - 2);
+    const current = sections[currentIndex < 0 ? sections.length - 1 : currentIndex];
+    const previous = sections[Math.max(0, (currentIndex < 0 ? sections.length - 1 : currentIndex) - 1)];
+    const distance = Math.max(1, current.offsetTop - previous.offsetTop);
+    const previousExposure = (current.offsetTop - position) / distance;
+    target = previousExposure > .3 ? previous : current;
+  } else {
+    const currentIndex = sections.reduce((index, section, candidate) =>
+      section.offsetTop <= position + 2 ? candidate : index, 0);
+    const current = sections[currentIndex];
+    const next = sections[currentIndex + 1];
+    if (!next) target = current;
+    else {
+      const distance = Math.max(1, next.offsetTop - current.offsetTop);
+      const nextExposure = (position - current.offsetTop) / distance;
+      target = nextExposure > .3 ? next : current;
+    }
   }
   if (Math.abs(scrollY - target.offsetTop) <= 2) return;
   snapping = true;
-  scrollTo({ top: target.offsetTop, behavior: motionPreference.matches ? 'instant' : 'smooth' });
+  snapTargetY = target.offsetTop;
+  scrollTo({ top: snapTargetY, behavior: motionPreference.matches ? 'instant' : 'smooth' });
   snapReleaseTimer = setTimeout(releaseThresholdSnap, 1000);
 }
 
@@ -278,19 +299,55 @@ function scheduleThresholdSnap() {
 }
 
 addEventListener('scroll', () => {
-  scheduleThresholdSnap();
+  if (!snapping) {
+    const delta = scrollY - directionSampleY;
+    if (Math.abs(delta) > .5) {
+      scrollDirection = Math.sign(delta);
+      directionSampleY = scrollY;
+    }
+    if (!supportsScrollEnd) scheduleThresholdSnap();
+  }
   if (framePending) return;
   framePending = true;
   requestAnimationFrame(updateNavigation);
 }, { passive: true });
-addEventListener('scrollend', () => {
-  clearTimeout(snapTimer);
-  if (snapping) releaseThresholdSnap();
-  else snapAtThreshold();
+if (supportsScrollEnd) {
+  addEventListener('scrollend', () => {
+    clearTimeout(snapTimer);
+    if (!snapping) {
+      snapAtThreshold();
+      return;
+    }
+    const reachedTarget = Math.abs(scrollY - snapTargetY) <= 2;
+    releaseThresholdSnap();
+    if (!reachedTarget) scheduleThresholdSnap();
+  }, { passive: true });
+}
+function interruptThresholdSnap() {
+  if (!snapping) return;
+  scrollTo({ top: scrollY, behavior: 'instant' });
+  releaseThresholdSnap();
+}
+addEventListener('wheel', (event) => {
+  if (Math.abs(event.deltaY) > .5) scrollDirection = Math.sign(event.deltaY);
+  interruptThresholdSnap();
 }, { passive: true });
-['wheel', 'touchstart'].forEach((event) => addEventListener(event, () => {
-  if (snapping) releaseThresholdSnap();
-}, { passive: true }));
+['touchstart', 'pointerdown'].forEach((event) =>
+  addEventListener(event, interruptThresholdSnap, { passive: true }));
+addEventListener('keydown', (event) => {
+  const directions = {
+    ArrowUp: -1,
+    PageUp: -1,
+    Home: -1,
+    ArrowDown: 1,
+    PageDown: 1,
+    End: 1,
+    ' ': 1,
+  };
+  if (!(event.key in directions)) return;
+  scrollDirection = event.key === ' ' && event.shiftKey ? -1 : directions[event.key];
+  interruptThresholdSnap();
+});
 addEventListener('resize', updateNavigation);
 updateNavigation();
 
