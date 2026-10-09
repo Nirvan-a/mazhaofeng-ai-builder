@@ -1,6 +1,6 @@
 import './styles.css';
 
-const ASSET_ROOT = '/spark/app/app_17fqurz8tq0/runtime/api/v1/storage/object/bucket_aadkzdtnjwiby';
+const ASSET_ROOT = '/app/app_17fqurz8tq0/runtime/api/v1/storage/object/bucket_aadkzdtnjwiby';
 
 const clients = [
   '布基纳法索电力公司', '沙特电力公司', '中国铜业集团', '方太集团',
