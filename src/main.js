@@ -24,11 +24,10 @@ const clientGroup = (items, duplicate = false) => `
   <div class="client-group" ${duplicate ? 'aria-hidden="true" inert' : ''}>
     ${items.map(({ name, logo, brand, width, height }) => `
       <span class="client-item">
-        <span class="client-mark client-mark-${brand}" aria-hidden="true">
-          ${logo
-    ? `<img src="${logo}" alt="" width="${width}" height="${height}" decoding="async" />`
-    : '<span class="client-confidential">保密</span>'}
-        </span>
+        ${logo ? `
+          <span class="client-mark client-mark-${brand}" aria-hidden="true">
+            <img src="${logo}" alt="" width="${width}" height="${height}" decoding="async" />
+          </span>` : ''}
         <span class="client-name">${name}</span>
       </span><i aria-hidden="true"></i>`).join('')}
   </div>`;
@@ -124,7 +123,7 @@ document.querySelector('#app').innerHTML = `
             <p>布基纳法索 · 沙特</p>
             </div>
             <div class="work-footer">
-              <a class="text-link award-link" href="https://www.seetao.com/details/253446.html" target="_blank" rel="noreferrer">团队单项目中标 <strong class="red">1 亿美元</strong><span class="sr-only">（查看报道，新窗口打开）</span></a>
+              <a class="text-link award-link" href="https://www.seetao.com/details/253446.html" target="_blank" rel="noreferrer">单项目中标 <strong class="red">1 亿美元</strong><span class="sr-only">（查看报道，新窗口打开）</span></a>
               <span class="work-bottom">BUSINESS DEVELOPMENT</span>
             </div>
           </div>
