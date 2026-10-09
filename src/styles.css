@@ -132,11 +132,9 @@ footer a { padding-bottom: 8px; border-bottom: 1px solid; }
 .lightbox-close { position: absolute; top: 12px; right: 12px; z-index: 2; width: 44px; height: 44px; border: 0; border-radius: 50%; background: white; color: black; font-size: 28px; cursor: pointer; }
 
 @media (max-width: 900px) {
-  .site-header.mobile-only { display: grid; }
-  .approved-section { padding-top: 76px; background: #f5f4f1; }
-  .approved-hero { padding-top: 0; }
+  .site-header.mobile-only { display: none; }
+  .approved-section { background: #f5f4f1; }
   .approved-visual { min-height: 56vw; object-fit: contain; }
-  .approved-hero .approved-visual { padding-top: 76px; }
   .site-header { grid-template-columns: 1fr auto; }
   .site-header nav { display: none; }
   .header-index { display: none; }
