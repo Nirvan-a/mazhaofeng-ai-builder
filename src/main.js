@@ -105,7 +105,7 @@ document.querySelector('#app').innerHTML = `
             <span class="work-index">02 <i aria-hidden="true"></i> BEYOND BORDERS</span>
             <div class="work-body">
             <h3>海外商务<span class="red">拓展</span></h3>
-            <p>非洲 / 沙特<br>单项目中标 <strong class="red">1 亿美元</strong></p>
+            <p>非洲 / 沙特<br><a class="award-link" href="https://www.seetao.com/details/253446.html" target="_blank" rel="noreferrer">单项目中标 <strong class="red">1 亿美元</strong><span aria-hidden="true">↗</span><span class="sr-only">（查看报道，新窗口打开）</span></a></p>
             </div>
             <span class="work-bottom">BUSINESS DEVELOPMENT</span>
           </div>
