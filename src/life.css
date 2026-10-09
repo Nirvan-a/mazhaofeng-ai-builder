@@ -1,0 +1,622 @@
+section#life.life {
+  --life-height: 390px;
+  --life-gap: 20px;
+  position: relative;
+  display: block;
+  isolation: isolate;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: clamp(72px, 8vw, 120px) 0 clamp(48px, 6vw, 88px);
+  overflow: hidden;
+  background: var(--paper, #f8f7f4);
+  color: var(--ink, #111);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  text-align: left;
+  scroll-margin-top: 76px;
+}
+
+#life.life *,
+#life.life *::before,
+#life.life *::after {
+  box-sizing: border-box;
+}
+
+#life.life .life-heading,
+#life.life .life-toolbar,
+#life.life .life-colophon {
+  margin-inline: var(--gutter, clamp(24px, 4.5vw, 76px));
+}
+
+#life.life .life-heading {
+  display: block;
+  padding: 0;
+  border: 0;
+}
+
+#life.life .life-kicker {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin: 0 0 24px;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--line, rgba(17, 17, 17, .2));
+  font: 500 11px/1.4 var(--mono, "SFMono-Regular", Consolas, monospace);
+  letter-spacing: .15em;
+}
+
+#life.life .life-chapter {
+  color: var(--red, #d71920);
+  font: 400 58px/.85 var(--serif, "Bodoni 72", Didot, "Times New Roman", serif);
+  letter-spacing: -.06em;
+}
+
+#life.life .life-heading-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px 36px;
+}
+
+#life.life #life-title {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--ink, #111);
+  font-family: inherit;
+  font-size: clamp(32px, 4.1vw, 62px);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+}
+
+#life.life .life-intro {
+  margin: 0;
+  color: var(--muted, #777);
+  font-size: 14px;
+  line-height: 1.8;
+  letter-spacing: .025em;
+}
+
+#life.life .life-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  margin-top: 38px;
+  margin-bottom: 18px;
+}
+
+#life.life .life-instruction {
+  margin: 0;
+  color: var(--muted, #777);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+#life.life .life-instruction > span {
+  margin-left: 10px;
+  font: 400 10px/1.6 var(--mono, "SFMono-Regular", Consolas, monospace);
+  letter-spacing: .04em;
+}
+
+#life.life .life-controls {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+#life.life .life-control,
+#life.life .life-lightbox-button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: auto;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 14px;
+  border: 1px solid var(--line, rgba(17, 17, 17, .2));
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink, #111);
+  font: 500 12px/1 "PingFang SC", "Microsoft YaHei", sans-serif;
+  letter-spacing: .015em;
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+
+#life.life .life-step {
+  width: 44px;
+  padding: 0;
+}
+
+#life.life .life-toggle {
+  min-width: 126px;
+}
+
+#life.life .life-control:hover:not(:disabled),
+#life.life .life-lightbox-button:hover:not(:disabled) {
+  border-color: var(--ink, #111);
+  background: var(--ink, #111);
+  color: var(--paper, #f8f7f4);
+}
+
+#life.life button:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+#life.life .life-toggle-icon {
+  display: block;
+  width: 9px;
+  height: 11px;
+  border-inline: 3px solid currentColor;
+}
+
+#life.life .life-toggle[data-state="paused"] .life-toggle-icon {
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-right: 0;
+  border-left: 9px solid currentColor;
+}
+
+#life.life .life-toggle[data-state="reduced"] .life-toggle-icon {
+  width: 9px;
+  height: 9px;
+  border: 1px solid currentColor;
+}
+
+#life.life .life-reel {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 5px var(--gutter, clamp(24px, 4.5vw, 76px)) 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-behavior: auto;
+  scroll-snap-type: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink, #111) transparent;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y pinch-zoom;
+}
+
+#life.life .life-reel::-webkit-scrollbar {
+  height: 3px;
+}
+
+#life.life .life-reel::-webkit-scrollbar-thumb {
+  background: var(--ink, #111);
+}
+
+#life.life .life-track {
+  position: relative;
+  display: flex;
+  width: max-content;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  direction: ltr;
+  transform: none;
+  animation: none;
+}
+
+#life.life .life-group {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  gap: var(--life-gap);
+  margin: 0;
+  padding: 0 var(--life-gap) 0 0;
+}
+
+#life.life .life-group[hidden] {
+  display: none;
+}
+
+#life.life .life-frame {
+  display: block;
+  flex: 0 0 auto;
+  width: calc(var(--life-height) * .74);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+#life.life .life-frame-wide {
+  width: calc(var(--life-height) * 1.52);
+}
+
+#life.life .life-frame[style] {
+  width: calc(var(--life-height) * var(--frame-ratio));
+}
+
+#life.life .life-photo {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: var(--life-height);
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: #e9e7e2;
+  color: var(--paper, #f8f7f4);
+  cursor: zoom-in;
+  appearance: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#life.life .life-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  transform: none;
+  filter: none;
+}
+
+#life.life .life-photo-open {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+  padding: 9px 11px;
+  background: var(--paper, #f8f7f4);
+  color: var(--ink, #111);
+  font: 500 11px/1.2 "PingFang SC", "Microsoft YaHei", sans-serif;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+#life.life .life-photo-open > span {
+  color: var(--red, #d71920);
+  font-size: 19px;
+  line-height: 12px;
+}
+
+#life.life .life-photo:hover .life-photo-open,
+#life.life .life-photo:focus-visible .life-photo-open {
+  opacity: 1;
+}
+
+#life.life.life-is-dragging,
+#life.life.life-is-dragging .life-photo {
+  cursor: grabbing;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#life.life.life-is-dragging .life-photo-open {
+  opacity: 0;
+}
+
+#life.life .life-caption {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 0;
+  padding: 16px 0 0;
+  text-align: left;
+}
+
+#life.life .life-photo-number {
+  flex: 0 0 auto;
+  color: var(--red, #d71920);
+  font: 400 11px/1.5 var(--mono, "SFMono-Regular", Consolas, monospace);
+}
+
+#life.life .life-caption-copy {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+
+#life.life .life-caption-title {
+  color: var(--ink, #111);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#life.life .life-photo-meta {
+  color: var(--muted, #777);
+  font: 400 10px/1.6 var(--mono, "SFMono-Regular", Consolas, monospace);
+  letter-spacing: .035em;
+  overflow-wrap: anywhere;
+}
+
+#life.life .life-colophon {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line, rgba(17, 17, 17, .2));
+}
+
+#life.life .life-colophon > p {
+  margin: 0;
+  font: 400 clamp(25px, 3.2vw, 46px)/1 var(--serif, "Bodoni 72", Didot, "Times New Roman", serif);
+  letter-spacing: -.045em;
+}
+
+#life.life .life-colophon > span {
+  color: var(--muted, #777);
+  font: 400 10px/1.6 var(--mono, "SFMono-Regular", Consolas, monospace);
+  letter-spacing: .075em;
+}
+
+#life.life .life-colophon > span > span {
+  margin-inline: 8px;
+  color: var(--red, #d71920);
+}
+
+#life.life .life-empty {
+  margin: 40px var(--gutter, clamp(24px, 4.5vw, 76px));
+  color: var(--muted, #777);
+}
+
+#life.life .life-control:focus-visible,
+#life.life .life-photo:focus-visible,
+#life.life .life-lightbox-button:focus-visible {
+  outline: 2px solid var(--red, #d71920);
+  outline-offset: 3px;
+}
+
+#life.life .life-reel:focus-visible {
+  outline: 2px solid var(--red, #d71920);
+  outline-offset: -2px;
+}
+
+#life.life .life-lightbox {
+  position: fixed;
+  inset: 0;
+  width: min(1100px, calc(100vw - 48px));
+  max-width: none;
+  height: auto;
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line, rgba(17, 17, 17, .2));
+  border-radius: 0;
+  background: var(--paper, #f8f7f4);
+  color: var(--ink, #111);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  box-shadow: 0 28px 100px rgba(0, 0, 0, .25);
+}
+
+#life.life .life-lightbox:not([open]) {
+  display: none;
+}
+
+#life.life .life-lightbox[open] {
+  display: block;
+}
+
+#life.life .life-lightbox::backdrop {
+  background: rgba(17, 17, 17, .84);
+}
+
+#life.life .life-lightbox-shell {
+  padding: 18px 22px 20px;
+}
+
+#life.life .life-lightbox-top,
+#life.life .life-lightbox-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+#life.life .life-lightbox-top {
+  margin-bottom: 16px;
+}
+
+#life.life .life-lightbox-top h3 {
+  margin: 0;
+  color: var(--ink, #111);
+  font: 500 12px/1.5 "PingFang SC", "Microsoft YaHei", sans-serif;
+  letter-spacing: .025em;
+}
+
+#life.life .life-lightbox-top h3 > span {
+  margin-left: 9px;
+  color: var(--red, #d71920);
+  font-family: var(--mono, "SFMono-Regular", Consolas, monospace);
+}
+
+#life.life .life-lightbox-figure {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+#life.life .life-lightbox-image {
+  display: block;
+  width: 100%;
+  height: min(62vh, 720px);
+  height: min(62dvh, 720px);
+  max-width: 100%;
+  max-height: none;
+  margin: 0;
+  background: #eeece7;
+  object-fit: contain;
+}
+
+#life.life .life-lightbox-caption {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 18px 0;
+  overflow-wrap: anywhere;
+}
+
+#life.life .life-lightbox-caption > strong {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+#life.life .life-lightbox-caption > span {
+  color: var(--muted, #777);
+  font: 400 11px/1.5 var(--mono, "SFMono-Regular", Consolas, monospace);
+  letter-spacing: .04em;
+}
+
+#life.life .life-lightbox-caption > span:empty {
+  display: none;
+}
+
+#life.life .life-lightbox-bottom {
+  padding-top: 14px;
+  border-top: 1px solid var(--line, rgba(17, 17, 17, .2));
+}
+
+#life.life .life-lightbox-bottom > p {
+  margin: 0;
+  color: var(--muted, #777);
+  font: 400 11px/1.5 "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+#life.life .life-lightbox-bottom > p > span {
+  margin-inline: 8px;
+}
+
+@media (max-width: 700px) {
+  section#life.life {
+    --life-height: 280px;
+    --life-gap: 14px;
+    padding-top: 64px;
+    padding-bottom: 48px;
+  }
+
+  #life.life .life-kicker {
+    gap: 18px;
+    margin-bottom: 22px;
+    font-size: 10px;
+  }
+
+  #life.life .life-chapter {
+    font-size: 48px;
+  }
+
+  #life.life .life-heading-row {
+    display: block;
+  }
+
+  #life.life #life-title {
+    max-width: 12em;
+    font-size: clamp(28px, 7.5vw, 42px);
+    line-height: 1.35;
+  }
+
+  #life.life .life-intro {
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  #life.life .life-toolbar {
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 28px;
+    margin-bottom: 14px;
+  }
+
+  #life.life .life-instruction > span {
+    display: none;
+  }
+
+  #life.life .life-controls {
+    margin-left: auto;
+  }
+
+  #life.life .life-frame-wide {
+    width: calc(var(--life-height) * 1.4);
+  }
+
+  #life.life .life-frame-portrait {
+    width: calc(var(--life-height) * .75);
+  }
+
+  #life.life .life-caption {
+    gap: 10px;
+    padding-top: 13px;
+  }
+
+  #life.life .life-caption-title {
+    font-size: 13px;
+  }
+
+  #life.life .life-colophon {
+    gap: 16px;
+    margin-top: 18px;
+    padding-top: 22px;
+  }
+
+  #life.life .life-lightbox {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+
+  #life.life .life-lightbox-shell {
+    padding: 12px 14px 14px;
+  }
+
+  #life.life .life-lightbox-image {
+    height: 55vh;
+    height: 55dvh;
+  }
+
+  #life.life .life-lightbox-caption {
+    padding-block: 14px;
+  }
+
+  #life.life .life-lightbox-bottom {
+    gap: 8px;
+  }
+}
+
+@media (hover: none) {
+  #life.life .life-photo-open {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #life.life *,
+  #life.life *::before,
+  #life.life *::after {
+    scroll-behavior: auto;
+    animation: none;
+    transition: none;
+  }
+}
