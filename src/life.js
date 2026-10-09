@@ -285,20 +285,6 @@ export function initLife(photos) {
     pause('pointer', false);
   }
 
-  listen(reel, 'pointerenter', (event) => {
-    if (event.pointerType === 'mouse') pause('hover', true);
-  });
-  listen(reel, 'pointerleave', (event) => {
-    if (event.pointerType === 'mouse') pause('hover', false);
-  });
-  listen(root, 'focusin', (event) => {
-    pause('focus', event.target === reel || original.contains(event.target) || dialog.contains(event.target));
-  });
-  listen(root, 'focusout', () => {
-    queueMicrotask(() => {
-      if (!disposed) pause('focus', document.activeElement === reel || original.contains(document.activeElement) || dialog.contains(document.activeElement));
-    });
-  });
   listen(reel, 'wheel', holdManual, { passive: true });
   listen(reel, 'scroll', () => {
     wrapScroll();
@@ -362,7 +348,6 @@ export function initLife(photos) {
   listen(original, 'load', (event) => preserveRatio(event.target), { capture: true });
   original.querySelectorAll('img').forEach(preserveRatio);
   pause('hidden', document.hidden);
-  pause('focus', root.contains(document.activeElement));
 
   const resizeObserver = new ResizeObserver(measure);
   resizeObserver.observe(reel);

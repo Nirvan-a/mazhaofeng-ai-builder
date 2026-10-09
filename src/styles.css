@@ -148,8 +148,7 @@ h1 > span { display: block; width: fit-content; }
 .client-name { font-size: clamp(19px, 3dvh, 32px); line-height: 1.4; font-weight: 600; letter-spacing: -.03em; color: #393732; }
 .client-group i { height: 5px; width: 5px; margin-inline: 28px; flex-shrink: 0; border-radius: 50%; background: var(--red); }
 .clients:not(.is-offscreen) .client-track { will-change: transform; }
-.clients.is-offscreen .client-track,
-.client-marquee:focus-within .client-track { animation-play-state: paused; }
+.clients.is-offscreen .client-track { animation-play-state: paused; }
 .client-marquee.is-manual .client-track { animation: none; }
 .client-marquee.is-manual .client-group[aria-hidden] { display: none; }
 @keyframes clients-roll { to { transform: translateX(var(--client-shift, -50%)); } }

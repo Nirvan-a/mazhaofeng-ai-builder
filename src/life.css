@@ -168,9 +168,9 @@ section#life.life {
 
 #life.life .life-ending {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
-  gap: clamp(10px, 1.8dvh, 20px);
+  gap: clamp(24px, 4vw, 64px);
   min-width: 0;
   padding-top: clamp(12px, 2dvh, 22px);
   border-top: 1px solid var(--life-line);
@@ -185,18 +185,21 @@ section#life.life {
 }
 #life.life .life-outro > span { color: var(--red, #d71920); }
 #life.life .life-colophon {
-  grid-column: 1;
+  grid-column: 2;
   display: flex;
-  align-items: center;
-  gap: 32px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
   min-width: 0;
+  padding-bottom: 4px;
   color: var(--life-muted);
   font: 400 10px/1.5 var(--mono, "SFMono-Regular", Consolas, monospace);
   letter-spacing: .035em;
+  text-align: right;
 }
 #life.life .life-signature { margin: 0; color: var(--ink, #111110); }
 #life.life .life-signature > span { margin-left: 6px; color: var(--life-muted); }
-#life.life .life-location { margin-left: auto; }
+#life.life .life-location { margin-left: 0; }
 #life.life .life-back {
   display: inline-flex;
   align-items: center;
@@ -261,6 +264,21 @@ section#life.life {
 #life.life .life-lightbox-image { opacity: 0; transition: opacity .16s ease; }
 #life.life .life-lightbox-image.is-ready { opacity: 1; }
 
+@media (max-width: 900px) {
+  #life.life .life-ending { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  #life.life .life-outro { grid-column: 1; }
+  #life.life .life-colophon {
+    grid-column: 1;
+    grid-row: 2;
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+    padding-bottom: 0;
+    text-align: left;
+  }
+  #life.life .life-location { margin-left: auto; }
+}
+
 @media (max-width: 700px) {
   section#life.life { padding-top: calc(var(--header-h, 64px) + 20px); --life-caption-height: 26px; }
   #life.life .life-kicker { gap: 14px; font-size: 9px; }
@@ -268,7 +286,7 @@ section#life.life {
   #life.life .life-heading-row { flex-direction: column; align-items: stretch; gap: 8px; }
   #life.life .life-intro { align-self: flex-end; font-size: 10px; }
   #life.life .life-outro { grid-column: 1; font-size: clamp(32px, 9.3vw, 60px); }
-  #life.life .life-colophon { grid-column: 1; grid-row: 2; flex-wrap: wrap; gap: 0 18px; font-size: 9px; }
+  #life.life .life-colophon { grid-column: 1; grid-row: 2; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 0 18px; padding-bottom: 0; font-size: 9px; text-align: left; }
   #life.life .life-signature { width: 100%; }
   #life.life .life-location { margin-left: 0; }
   #life.life .life-back { min-height: 26px; gap: 8px; }
@@ -292,7 +310,7 @@ section#life.life {
   #life.life .life-reel { padding-left: 0; }
   #life.life .life-ending { grid-column: 1 / -1; gap: 4px 24px; padding-top: 10px; }
   #life.life .life-outro { grid-column: 1; font-size: clamp(28px, 10dvh, 46px); }
-  #life.life .life-colophon { grid-column: 1 / -1; grid-row: 2; flex-wrap: nowrap; }
+  #life.life .life-colophon { grid-column: 1 / -1; grid-row: 2; flex-direction: row; align-items: center; flex-wrap: nowrap; padding-bottom: 0; text-align: left; }
   #life.life .life-signature { width: auto; }
   #life.life .life-location { margin-left: auto; }
   #life.life .life-back { min-height: 24px; }
