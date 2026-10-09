@@ -25,10 +25,7 @@ export function renderLife(photos) {
         <p class="life-kicker"><span class="life-chapter">04</span><span>OFF THE CLOCK</span></p>
         <div class="life-heading-row">
           <h2 id="life-title">生活，不只一种现场</h2>
-          <p class="life-intro">
-            <span>一些日常，</span>
-            <span>一些好奇<span class="life-intro-dot">。</span></span>
-          </p>
+          <p class="life-intro">一些日常，一些好奇<span class="life-intro-dot">。</span></p>
         </div>
       </div>
       ${items.length ? `
@@ -51,11 +48,25 @@ export function renderLife(photos) {
       ` : '<p class="life-empty">暂时没有可展示的生活照片。</p>'}
       <footer class="life-ending" aria-label="结束语">
         <p class="life-outro">KEEP EXPLORING<span>.</span></p>
-        <p class="life-note">STAY CURIOUS.</p>
+        <button class="life-wechat" type="button" data-wechat-copy="M15378955467" aria-label="复制微信号 M15378955467">
+          <svg fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke="currentColor" stroke-linejoin="round" d="M16.5 9.5c0 -3.314 -3.358 -6 -7.5 -6 -4.142 0 -7.5 2.686 -7.5 6 0 1.891 1.094 3.578 2.803 4.678L4 17l3.302 -1.654a9.35 9.35 0 0 0 3.288 0.02" stroke-width="1"></path>
+            <path stroke="currentColor" stroke-linejoin="round" d="M6.5 8.5a0.5 0.5 0 0 1 0 -1" stroke-width="1"></path>
+            <path stroke="currentColor" stroke-linejoin="round" d="M6.5 8.5a0.5 0.5 0 0 0 0 -1" stroke-width="1"></path>
+            <path stroke="currentColor" stroke-linejoin="round" d="M11.5 8.5a0.5 0.5 0 0 1 0 -1" stroke-width="1"></path>
+            <path stroke="currentColor" stroke-linejoin="round" d="M11.5 8.5a0.5 0.5 0 0 0 0 -1" stroke-width="1"></path>
+            <path stroke="currentColor" stroke-linejoin="round" d="M14.25 13.5a0.25 0.25 0 1 1 0 -0.5" stroke-width="1"></path>
+            <path stroke="currentColor" stroke-linejoin="round" d="M14.25 13.5a0.25 0.25 0 1 0 0 -0.5" stroke-width="1"></path>
+            <path stroke="currentColor" stroke-linejoin="round" d="M18.75 13.5a0.25 0.25 0 1 1 0 -0.5" stroke-width="1"></path>
+            <path stroke="currentColor" stroke-linejoin="round" d="M18.75 13.5a0.25 0.25 0 1 0 0 -0.5" stroke-width="1"></path>
+            <path stroke="currentColor" stroke-linejoin="round" d="M10.5 14.5c0 2.761 2.686 5 6 5 0.34 0 0.675 -0.024 1 -0.07L21 21l-0.5 -2.773c1.227 -0.916 2 -2.246 2 -3.727 0 -2.761 -2.686 -5 -6 -5s-6 2.239 -6 5Z" stroke-width="1"></path>
+          </svg>
+          <span class="life-copy-toast" role="status" aria-live="polite"></span>
+        </button>
         <div class="life-colophon">
           <p class="life-signature">马兆峰 <span>/ AI BUILDER</span></p>
           <span class="life-location">Shanghai</span>
-          <a class="life-back" href="#home">返回顶部 <span aria-hidden="true">↑</span></a>
+          <a class="life-back" href="#home">期待认识新同学 ⬆️</a>
         </div>
       </footer>
       ${items.length ? `
@@ -73,9 +84,52 @@ export function initLife(photos) {
   if (!root) return () => {};
   if (instances.has(root)) return instances.get(root);
 
+  const controller = new AbortController();
+  const listen = (target, event, handler, options = {}) => {
+    target.addEventListener(event, handler, { ...options, signal: controller.signal });
+  };
+  let copyTimer = 0;
+  const copyButton = root.querySelector('[data-wechat-copy]');
+  listen(copyButton, 'click', async () => {
+    const value = copyButton.dataset.wechatCopy;
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(value);
+      copied = true;
+    } catch {
+      const helper = document.createElement('textarea');
+      helper.value = value;
+      helper.setAttribute('readonly', '');
+      helper.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+      document.body.append(helper);
+      helper.select();
+      copied = document.execCommand('copy');
+      helper.remove();
+    }
+    if (!copied) return;
+    const toast = copyButton.querySelector('.life-copy-toast');
+    toast.textContent = '已复制';
+    copyButton.classList.remove('is-copied');
+    void copyButton.offsetWidth;
+    copyButton.classList.add('is-copied');
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyButton.classList.remove('is-copied');
+      toast.textContent = '';
+    }, 1400);
+  });
+
   const items = normalizePhotos(photos);
   const reel = root.querySelector('.life-reel');
-  if (!reel || !items.length) return () => {};
+  if (!reel || !items.length) {
+    const disposeEmpty = () => {
+      controller.abort();
+      window.clearTimeout(copyTimer);
+      instances.delete(root);
+    };
+    instances.set(root, disposeEmpty);
+    return disposeEmpty;
+  }
 
   const track = root.querySelector('.life-track');
   const original = root.querySelector('[data-life-original]');
@@ -84,10 +138,6 @@ export function initLife(photos) {
   const previewImage = dialog.querySelector('[data-life-preview]');
   const fullImage = dialog.querySelector('[data-life-full]');
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const controller = new AbortController();
-  const listen = (target, event, handler, options = {}) => {
-    target.addEventListener(event, handler, { ...options, signal: controller.signal });
-  };
   const copies = [];
   const pauses = new Set(['layout', 'offscreen']);
   let span = 0;
@@ -139,7 +189,7 @@ export function initLife(photos) {
     syncPlayback();
   }
 
-  function holdManual(delay = 500) {
+  function holdManual(delay = 120) {
     pause('manual', true);
     window.clearTimeout(manualTimer);
     manualTimer = window.setTimeout(() => {
@@ -283,20 +333,20 @@ export function initLife(photos) {
     if (activePointer.moved || event.type === 'pointercancel') suppressClickUntil = performance.now() + 500;
     if (reel.hasPointerCapture(activePointer.id)) reel.releasePointerCapture(activePointer.id);
     root.classList.remove('life-is-dragging');
-    holdManual(400);
+    holdManual(80);
     pause('pointer', false);
   }
 
-  listen(reel, 'wheel', () => holdManual(500), { passive: true });
+  listen(reel, 'wheel', () => holdManual(120), { passive: true });
   listen(reel, 'scroll', () => {
     wrapScroll();
-    if (pauses.has('manual')) holdManual(500);
+    if (pauses.has('manual')) holdManual(120);
   }, { passive: true });
   listen(reel, 'keydown', (event) => {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
-      holdManual(400);
+      holdManual(100);
       reel.scrollLeft += (event.key === 'ArrowLeft' ? -1 : 1) * reel.clientWidth * .6;
     }
   });
@@ -372,6 +422,7 @@ export function initLife(photos) {
     controller.abort();
     cancelAnimationFrame(frame);
     window.clearTimeout(manualTimer);
+    window.clearTimeout(copyTimer);
     resizeObserver.disconnect();
     intersectionObserver.disconnect();
     imageObserver.disconnect();
