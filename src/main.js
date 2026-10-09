@@ -8,10 +8,10 @@ const clients = [
 ];
 
 const steps = [
-  { title: '学习', date: '2020 — 2024', text: '从商科出发', image: scenes.library, note: 'LEARN' },
-  { title: '创造', date: '2022 — 2023', text: '用代码表达想法', image: scenes.coding, note: 'BUILD' },
-  { title: '远行', date: '2024 — 2025', text: '在陌生现场理解业务', image: scenes.travel, note: 'EXPLORE' },
-  { title: '落地', date: '2025 — 至今', text: '让 AI 真正进入工作', image: scenes.collaboration, note: 'DELIVER' },
+  { title: '学习', date: '2020 — 2024', organization: '华中科技大学', role: '国际商务 &amp; 英语双学位', text: '从商科出发', image: scenes.library, note: 'LEARN' },
+  { title: '创造', date: '2022 — 2023', organization: '阿里巴巴 &amp; Cider', role: 'iOS 工程师', text: '用代码表达想法', image: scenes.coding, note: 'BUILD' },
+  { title: '远行', date: '2024 — 2025', organization: '特变电工', role: '市场经理', text: '在陌生现场理解业务', image: scenes.travel, note: 'EXPLORE' },
+  { title: '落地', date: '2025 — 至今', organization: '字节跳动', text: '让 AI 真正进入工作', image: scenes.collaboration, note: 'DELIVER' },
 ];
 
 const clientGroup = (names, duplicate = false) => `
@@ -62,7 +62,13 @@ document.querySelector('#app').innerHTML = `
           ${steps.map((step, index) => `
             <li class="journey-stage stage-${index + 1}">
               <img src="${step.image}" alt="" loading="lazy" decoding="async" />
-              <div class="stage-meta"><span class="stage-date">${step.date}</span><span class="stage-note">${String(index + 1).padStart(2, '0')} / ${step.note}</span></div>
+              <div class="stage-meta">
+                <div class="stage-dateline"><span class="stage-date">${step.date}</span><span class="stage-note">${step.note}</span></div>
+                <div class="stage-credential">
+                  <p class="stage-organization">${step.organization}</p>
+                  ${step.role ? `<p class="stage-role">${step.role}</p>` : ''}
+                </div>
+              </div>
               <div class="stage-copy"><i aria-hidden="true"></i><h3>${step.title}</h3><p>${step.text}</p></div>
             </li>`).join('')}
         </ol>
