@@ -2,8 +2,8 @@ section#life.life {
   --life-gap: clamp(12px, 1.4vw, 24px);
   --life-photo-height: min(40dvh, 380px);
   --life-caption-height: 28px;
-  --life-line: rgb(248 247 244 / 22%);
-  --life-muted: #a5a39c;
+  --life-line: var(--line, rgb(17 17 16 / 20%));
+  --life-muted: var(--muted, #75736e);
   position: relative;
   isolation: isolate;
   display: grid;
@@ -18,8 +18,8 @@ section#life.life {
   margin: 0;
   padding: calc(var(--header-h, 80px) + 20px) 0 20px;
   overflow: clip;
-  background: var(--ink, #111110);
-  color: var(--paper, #f8f7f4);
+  background: var(--paper, #f8f7f4);
+  color: var(--ink, #111110);
   font-family: "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
   text-align: left;
   scroll-margin-top: 0;
@@ -80,6 +80,7 @@ section#life.life {
   padding-inline: var(--gutter, clamp(20px, 4.5vw, 76px));
   overflow-x: auto;
   overflow-y: hidden;
+  contain: layout paint style;
   container-type: size;
   overscroll-behavior-x: contain;
   scroll-behavior: auto;
@@ -119,7 +120,7 @@ section#life.life {
   overflow: hidden;
   border: 0;
   border-radius: 0;
-  background: #1b1b19;
+  background: #e8e6e0;
   color: inherit;
   cursor: zoom-in;
   appearance: none;
@@ -132,8 +133,11 @@ section#life.life {
   height: 100%;
   max-width: none;
   object-fit: contain;
+  opacity: 0;
+  transition: opacity .35s ease;
   pointer-events: none;
 }
+#life.life .life-photo img.is-loaded { opacity: 1; }
 #life.life .life-caption {
   display: flex;
   align-items: center;
@@ -173,15 +177,15 @@ section#life.life {
 #life.life .life-github {
   display: inline-flex;
   align-items: center;
-  gap: 24px;
   min-height: 44px;
-  border-bottom: 1px solid var(--life-line);
   color: inherit;
   font: 400 13px/1 var(--mono, "SFMono-Regular", Consolas, monospace);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--life-line);
+  text-underline-offset: 3px;
 }
-#life.life .life-github > span { color: var(--red, #d71920); font-size: 22px; }
-#life.life .life-github:hover { border-color: var(--red, #d71920); }
+#life.life .life-github:hover { text-decoration-color: var(--red, #d71920); }
 #life.life .life-colophon {
   grid-column: 1 / -1;
   display: flex;
@@ -192,7 +196,7 @@ section#life.life {
   font: 400 10px/1.5 var(--mono, "SFMono-Regular", Consolas, monospace);
   letter-spacing: .035em;
 }
-#life.life .life-signature { margin: 0; color: var(--paper, #f8f7f4); }
+#life.life .life-signature { margin: 0; color: var(--ink, #111110); }
 #life.life .life-signature > span { margin-left: 6px; color: var(--life-muted); }
 #life.life .life-location { margin-left: auto; }
 #life.life .life-back {
@@ -203,13 +207,15 @@ section#life.life {
   color: inherit;
   text-decoration: none;
 }
-#life.life .life-back:hover { color: var(--paper, #f8f7f4); }
+#life.life .life-back:hover { color: var(--ink, #111110); }
 #life.life .life-empty { align-self: center; margin-inline: var(--gutter); color: var(--life-muted); }
 #life.life :is(a, button):focus-visible { outline: 2px solid var(--red, #d71920); outline-offset: 3px; }
 #life.life .life-reel:focus-visible { outline: 2px solid var(--red, #d71920); outline-offset: -2px; }
 #life.life .life-photo:focus-visible { outline-offset: -3px; }
 
 #life.life .life-lightbox {
+  --life-line: rgb(248 247 244 / 22%);
+  --life-muted: #a5a39c;
   position: fixed;
   inset: 0;
   width: min(1200px, calc(100vw - 32px));
@@ -278,7 +284,7 @@ section#life.life {
   #life.life #life-title { font-size: clamp(27px, 8vw, 34px); }
   #life.life .life-intro { display: none; }
   #life.life .life-outro { grid-column: 1 / -1; font-size: clamp(32px, 9.3vw, 60px); }
-  #life.life .life-github { grid-column: 2; grid-row: 2; gap: 14px; font-size: 11px; }
+  #life.life .life-github { grid-column: 2; grid-row: 2; font-size: 11px; }
   #life.life .life-colophon { grid-column: 1; grid-row: 2; flex-wrap: wrap; gap: 0 18px; font-size: 9px; }
   #life.life .life-signature { width: 100%; }
   #life.life .life-location { margin-left: 0; }

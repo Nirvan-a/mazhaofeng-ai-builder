@@ -3,20 +3,30 @@ import { scenes, lifePhotos } from './photos.js';
 import { renderLife, initLife } from './life.js';
 
 const clients = [
-  '布基纳法索电力公司', '沙特电力公司', '中国铜业集团', '方太集团',
-  '瑞幸咖啡', '上汽集团', '远景能源', '某军工集团',
+  { name: '布基纳法索电力公司', mark: 'SONABEL', brand: 'sonabel' },
+  { name: '沙特电力公司', mark: 'Saudi Energy', brand: 'saudi-energy' },
+  { name: '中国铜业集团', mark: 'China Copper', brand: 'china-copper' },
+  { name: '方太集团', mark: 'FOTILE', brand: 'fotile' },
+  { name: '瑞幸咖啡', mark: 'luckin coffee', brand: 'luckin' },
+  { name: '上汽集团', mark: 'SAIC MOTOR', brand: 'saic' },
+  { name: '远景能源', mark: 'Envision Energy', brand: 'envision' },
+  { name: '某军工集团', mark: 'CONFIDENTIAL', brand: 'confidential' },
 ];
 
 const steps = [
   { title: '学习', date: '2020 — 2024', organization: '华中科技大学', role: '国际商务 &amp; 英语双学位', text: '从商科出发', image: scenes.library, note: 'LEARN' },
   { title: '创造', date: '2022 — 2023', organization: '阿里巴巴 &amp; Cider', role: 'iOS 工程师', text: '用代码表达想法', image: scenes.coding, note: 'BUILD' },
-  { title: '远行', date: '2024 — 2025', organization: '特变电工', role: '市场经理', text: '在陌生现场理解业务', image: scenes.travel, note: 'EXPLORE' },
-  { title: '落地', date: '2025 — 至今', organization: '字节跳动', text: '让 AI 真正进入工作', image: scenes.collaboration, note: 'DELIVER' },
+  { title: '远行', date: '2024 — 2025', organization: '特变电工', role: '市场经理', text: '在驻外现场理解业务', image: scenes.travel, note: 'EXPLORE' },
+  { title: '实践', date: '2026 — 至今', organization: '字节跳动', text: '让 AI 真正进入工作', image: scenes.collaboration, note: 'PRACTICE' },
 ];
 
-const clientGroup = (names, duplicate = false) => `
+const clientGroup = (items, duplicate = false) => `
   <div class="client-group" ${duplicate ? 'aria-hidden="true" inert' : ''}>
-    ${names.map((name) => `<span>${name}</span><i aria-hidden="true"></i>`).join('')}
+    ${items.map(({ name, mark, brand }) => `
+      <span class="client-item">
+        <span class="client-mark client-mark-${brand}" aria-hidden="true">${mark}</span>
+        <span class="client-name">${name}</span>
+      </span><i aria-hidden="true"></i>`).join('')}
   </div>`;
 
 document.querySelector('#app').innerHTML = `
@@ -36,7 +46,7 @@ document.querySelector('#app').innerHTML = `
     <section id="home" class="page hero" aria-labelledby="hero-title">
       <div class="hero-art" aria-hidden="true">
         <div class="hero-landscape">
-          <img src="${scenes.hero}" alt="" fetchpriority="high" decoding="async" />
+          <img src="${scenes.hero}" alt="" width="1586" height="992" fetchpriority="high" decoding="async" />
         </div>
         <div class="hero-red"></div>
       </div>
@@ -61,7 +71,7 @@ document.querySelector('#app').innerHTML = `
         <ol class="journey-stages">
           ${steps.map((step, index) => `
             <li class="journey-stage stage-${index + 1}">
-              <img src="${step.image}" alt="" loading="lazy" decoding="async" />
+              <img data-section-src="${step.image}" alt="" decoding="async" fetchpriority="low" />
               <div class="stage-meta">
                 <div class="stage-dateline"><span class="stage-date">${step.date}</span><span class="stage-note">${step.note}</span></div>
                 <div class="stage-credential">
@@ -88,26 +98,32 @@ document.querySelector('#app').innerHTML = `
       </div>
       <div class="work-grid">
         <article class="work-card work-code reveal">
-          <img class="work-picture" src="${scenes.architecture}" alt="" loading="lazy" decoding="async" />
+          <img class="work-picture" data-section-src="${scenes.architecture}" alt="" decoding="async" fetchpriority="low" />
           <div class="work-content">
             <span class="work-index">01 <i aria-hidden="true"></i> A NEW LANGUAGE</span>
             <div class="work-body">
             <h3>商科<span class="red">转码</span></h3>
-            <p><strong>7个月</strong>拿下阿里开发</p>
+            <p><strong>7个月</strong>自学速成<wbr>转战计算机</p>
             </div>
-            <a class="text-link" href="https://github.com/Nirvan-a" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span><span class="sr-only">（新窗口打开）</span></a>
+            <div class="work-footer">
+              <a class="text-link" href="https://github.com/Nirvan-a" target="_blank" rel="noreferrer">GitHub<span class="sr-only">（新窗口打开）</span></a>
+              <span class="work-bottom">FROM BUSINESS TO CODE</span>
+            </div>
           </div>
         </article>
         <article class="work-card work-global reveal">
-          <img class="work-picture" src="${scenes.travel}" alt="" loading="lazy" decoding="async" />
+          <img class="work-picture" data-section-src="${scenes.travel}" alt="" decoding="async" fetchpriority="low" />
           <div class="global-sun" aria-hidden="true"></div>
           <div class="work-content">
             <span class="work-index">02 <i aria-hidden="true"></i> BEYOND BORDERS</span>
             <div class="work-body">
-            <h3>海外商务<span class="red">拓展</span></h3>
-            <p>非洲 / 沙特<br><a class="award-link" href="https://www.seetao.com/details/253446.html" target="_blank" rel="noreferrer">单项目中标 <strong class="red">1 亿美元</strong><span aria-hidden="true">↗</span><span class="sr-only">（查看报道，新窗口打开）</span></a></p>
+            <h3>海外<span class="red">商务</span></h3>
+            <p>布基纳法索 · 沙特</p>
             </div>
-            <span class="work-bottom">BUSINESS DEVELOPMENT</span>
+            <div class="work-footer">
+              <a class="text-link award-link" href="https://www.seetao.com/details/253446.html" target="_blank" rel="noreferrer">单项目中标 <strong class="red">1 亿美元</strong><span class="sr-only">（查看报道，新窗口打开）</span></a>
+              <span class="work-bottom">BUSINESS DEVELOPMENT</span>
+            </div>
           </div>
         </article>
         <article class="work-card work-products reveal">
@@ -115,25 +131,25 @@ document.querySelector('#app').innerHTML = `
           <div class="work-content">
             <span class="work-index">03 <i aria-hidden="true"></i> BUILT FROM SCRATCH</span>
             <div class="work-body">
-            <h3>AI <span class="red">产品</span></h3>
-            <p>手搓智能问数 · DeepResearch<br><span class="work-detail">Skill 前时代的工作流实践</span></p>
+            <h3><span class="red">产品</span>经理</h3>
+            <p>工作流平台设计 &amp; 搭建</p>
             </div>
             <span class="work-bottom">QUESTION → RESEARCH → ANSWER</span>
           </div>
         </article>
         <article class="work-card work-advisory reveal">
-          <img class="work-picture" src="${scenes.hero}" alt="" loading="lazy" decoding="async" />
+          <img class="work-picture" data-section-src="${scenes.hero}" alt="" decoding="async" fetchpriority="low" />
           <div class="work-content">
             <span class="work-index">04 <i aria-hidden="true"></i> INTO THE REAL WORLD</span>
             <div class="work-body">
-            <h3>AI <span class="red">方案</span>顾问</h3>
-            <p>字节跳动<br>Agent 服务 · AI 项目落地</p>
+            <h3>AI <span class="red">解决</span>方案</h3>
+            <p>豆包工作伙伴 &amp; 妙搭服务</p>
             </div>
             <span class="work-bottom">FROM POSSIBILITY TO PRACTICE</span>
           </div>
         </article>
       </div>
-      <aside class="clients" aria-labelledby="clients-title">
+      <aside class="clients is-offscreen" aria-labelledby="clients-title">
       <div class="client-heading">
         <h2 id="clients-title">SELECTED CLIENTS <span>/</span> 服务企业</h2>
         <i aria-hidden="true"></i>
@@ -149,14 +165,32 @@ document.querySelector('#app').innerHTML = `
 
 `;
 
-initLife(lifePhotos);
-
 // Decode the photograph before revealing its entire art layer, including red.
 // A failed or slow image leaves a neutral, fully usable introduction.
 const heroImage = document.querySelector('.hero-landscape img');
 heroImage.decode().then(() => {
   document.querySelector('.hero-art').classList.add('is-ready');
 }).catch(() => {});
+
+const sectionImageObserver = new IntersectionObserver((entries) => {
+  for (const entry of entries) {
+    if (!entry.isIntersecting) continue;
+    const image = entry.target;
+    image.src = image.dataset.sectionSrc;
+    image.removeAttribute('data-section-src');
+    sectionImageObserver.unobserve(image);
+  }
+}, { rootMargin: '0px 0px -25% 0px' });
+document.querySelectorAll('img[data-section-src]').forEach((image) => sectionImageObserver.observe(image));
+
+const lifeSection = document.querySelector('#life');
+const lifeInitializer = new IntersectionObserver((entries) => {
+  if (!entries.some((entry) => entry.isIntersecting)) return;
+  initLife(lifePhotos);
+  lifeInitializer.disconnect();
+}, { rootMargin: '0px 0px -5% 0px' });
+lifeInitializer.observe(document.querySelector('#work'));
+lifeInitializer.observe(lifeSection);
 
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 const reveals = document.querySelectorAll('.reveal');
@@ -199,12 +233,14 @@ const header = document.querySelector('.site-header');
 const sections = [...document.querySelectorAll('main > section[id]')];
 const navigation = [...document.querySelectorAll('.site-header nav a')];
 let framePending = false;
+let snapTimer = 0;
+let snapReleaseTimer = 0;
+let snapping = false;
 function updateNavigation() {
   framePending = false;
   header.classList.toggle('scrolled', scrollY > 64);
   const current = sections.reduce((active, section) =>
     section.getBoundingClientRect().top <= innerHeight * 0.4 ? section : active, sections[0]);
-  header.classList.toggle('on-dark', current.id === 'life');
   navigation.forEach((link) => {
     const active = link.hash === `#${current.id}`;
     link.classList.toggle('active', active);
@@ -212,16 +248,58 @@ function updateNavigation() {
     else link.removeAttribute('aria-current');
   });
 }
+
+function releaseThresholdSnap() {
+  snapping = false;
+  clearTimeout(snapReleaseTimer);
+}
+
+function snapAtThreshold() {
+  snapTimer = 0;
+  if (snapping || document.querySelector('.life-lightbox[open]')) return;
+  const currentIndex = sections.reduce((index, section, candidate) =>
+    section.offsetTop <= scrollY + 2 ? candidate : index, 0);
+  const current = sections[currentIndex];
+  const next = sections[currentIndex + 1];
+  let target = current;
+  if (next) {
+    const bounds = next.getBoundingClientRect();
+    const visible = Math.max(0, Math.min(bounds.height, innerHeight - Math.max(0, bounds.top)));
+    if (visible / bounds.height > .3) target = next;
+  }
+  if (Math.abs(scrollY - target.offsetTop) <= 2) return;
+  snapping = true;
+  scrollTo({ top: target.offsetTop, behavior: motionPreference.matches ? 'instant' : 'smooth' });
+  snapReleaseTimer = setTimeout(releaseThresholdSnap, 1000);
+}
+
+function scheduleThresholdSnap() {
+  clearTimeout(snapTimer);
+  if (!snapping) snapTimer = setTimeout(snapAtThreshold, 180);
+}
+
 addEventListener('scroll', () => {
+  scheduleThresholdSnap();
   if (framePending) return;
   framePending = true;
   requestAnimationFrame(updateNavigation);
 }, { passive: true });
+addEventListener('scrollend', () => {
+  clearTimeout(snapTimer);
+  if (snapping) releaseThresholdSnap();
+  else snapAtThreshold();
+}, { passive: true });
+['wheel', 'touchstart'].forEach((event) => addEventListener(event, () => {
+  if (snapping) releaseThresholdSnap();
+}, { passive: true }));
 addEventListener('resize', updateNavigation);
 updateNavigation();
 
 const clientSection = document.querySelector('.clients');
 const clientRows = [...document.querySelectorAll('.client-marquee')];
+new IntersectionObserver(([entry]) => {
+  clientSection.classList.toggle('is-offscreen', !entry.isIntersecting);
+}).observe(clientSection);
 
 function sizeClientLoops() {
   clientRows.forEach((row) => {

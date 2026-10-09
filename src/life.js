@@ -8,6 +8,7 @@ const normalizePhotos = (photos) => (Array.isArray(photos) ? photos : [])
   .filter((photo) => photo && typeof photo.src === 'string' && photo.src.trim())
   .map((photo) => ({
     src: photo.src,
+    fullSrc: typeof photo.fullSrc === 'string' && photo.fullSrc.trim() ? photo.fullSrc : photo.src,
     alt: String(photo.alt || '生活剪影'),
     meta: String(photo.meta ?? ''),
     aspectRatio: Number.isFinite(photo.aspectRatio) && photo.aspectRatio > 0 ? photo.aspectRatio : (photo.wide === false ? .75 : 4 / 3),
@@ -35,7 +36,7 @@ export function renderLife(photos) {
               ${items.map((photo, index) => `
                 <figure class="life-frame" style="--frame-ratio:${photo.aspectRatio}">
                   <button class="life-photo" type="button" data-life-photo="${index}" aria-label="查看大图：${escapeHTML(photo.alt)}" aria-haspopup="dialog">
-                    <img src="${escapeHTML(photo.src)}" alt="${escapeHTML(photo.alt)}" loading="lazy" decoding="async" draggable="false" />
+                    <img data-src="${escapeHTML(photo.src)}" alt="${escapeHTML(photo.alt)}" decoding="async" fetchpriority="low" draggable="false" />
                   </button>
                   <figcaption class="life-caption">
                     <span class="life-photo-number">${number(index + 1)}</span>
@@ -48,7 +49,7 @@ export function renderLife(photos) {
       ` : '<p class="life-empty">暂时没有可展示的生活照片。</p>'}
       <footer class="life-ending" aria-label="结束语">
         <p class="life-outro">KEEP EXPLORING<span>.</span></p>
-        <a class="life-github" href="https://github.com/Nirvan-a" target="_blank" rel="noreferrer" aria-label="GitHub（新窗口打开）">GitHub <span aria-hidden="true">↗</span></a>
+        <a class="life-github" href="https://github.com/Nirvan-a" target="_blank" rel="noreferrer" aria-label="GitHub（新窗口打开）">GitHub</a>
         <div class="life-colophon">
           <p class="life-signature">马兆峰 <span>/ AI BUILDER</span></p>
           <span class="life-location">Shanghai</span>
@@ -113,6 +114,7 @@ export function initLife(photos) {
   let lastTrigger = null;
   let reelSnapshot = 0;
   let bodySnapshot = null;
+  let imagesHydrated = false;
   let disposed = false;
 
   function animate(time) {
@@ -123,7 +125,7 @@ export function initLife(photos) {
     }
     if (pauses.size) return;
     if (lastTime) {
-      autoPosition = span + modulo(autoPosition - span + Math.min(time - lastTime, 64) * .022, span);
+      autoPosition = span + modulo(autoPosition - span + Math.min(time - lastTime, 64) * .035, span);
       reel.scrollLeft = autoPosition;
     } else {
       autoPosition = reel.scrollLeft;
@@ -162,12 +164,22 @@ export function initLife(photos) {
     }
   }
 
+  function hydrateImages(scope = track) {
+    scope.querySelectorAll('img[data-src]').forEach((image) => {
+      const reveal = () => image.classList.add('is-loaded');
+      image.addEventListener('load', reveal, { once: true });
+      image.src = image.dataset.src;
+      image.removeAttribute('data-src');
+      if (image.complete) reveal();
+    });
+  }
+
   function measure() {
     const relative = looping ? reel.scrollLeft - span : reel.scrollLeft;
     span = original.getBoundingClientRect().width;
     looping = !motion.matches && span > 0;
-    // Cover a full viewport even when the complete photo set is shorter than it.
-    const count = looping ? Math.ceil(reel.clientWidth / span) + 2 : 0;
+    // Keep one group on either side; add more only if the set is shorter than the viewport.
+    const count = looping ? Math.max(2, Math.ceil(reel.clientWidth / span) + 1) : 0;
     while (copies.length < count) {
       const copy = original.cloneNode(true);
       copy.removeAttribute('data-life-original');
@@ -177,6 +189,7 @@ export function initLife(photos) {
       copy.querySelectorAll('img').forEach((image) => { image.alt = ''; });
       if (!copies.length) track.prepend(copy);
       else track.append(copy);
+      if (imagesHydrated) hydrateImages(copy);
       copies.push(copy);
     }
     copies.forEach((copy, index) => { copy.hidden = index >= count; });
@@ -228,6 +241,14 @@ export function initLife(photos) {
     const photo = items[current];
     fullImage.src = photo.src;
     fullImage.alt = photo.alt;
+    if (photo.fullSrc !== photo.src) {
+      const intended = photo.fullSrc;
+      const highResolution = new Image();
+      highResolution.onload = () => {
+        if (dialog.open && items[current].fullSrc === intended) fullImage.src = intended;
+      };
+      highResolution.src = intended;
+    }
     dialog.querySelector('[data-life-title]').textContent = photo.alt;
     dialog.querySelector('[data-life-meta]').textContent = photo.meta;
     dialog.querySelector('[data-life-counter]').textContent = `${number(current + 1)} / ${number(items.length)}`;
@@ -360,6 +381,13 @@ export function initLife(photos) {
   resizeObserver.observe(original);
   const intersectionObserver = new IntersectionObserver(([entry]) => pause('offscreen', !entry.isIntersecting));
   intersectionObserver.observe(root);
+  const imageObserver = new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting) return;
+    imagesHydrated = true;
+    hydrateImages();
+    imageObserver.disconnect();
+  }, { rootMargin: '0px 0px -5% 0px' });
+  imageObserver.observe(root);
 
   function dispose() {
     if (disposed) return;
@@ -371,6 +399,7 @@ export function initLife(photos) {
     window.clearTimeout(manualTimer);
     resizeObserver.disconnect();
     intersectionObserver.disconnect();
+    imageObserver.disconnect();
     copies.forEach((copy) => copy.remove());
     root.classList.remove('life-is-dragging');
     instances.delete(root);
