@@ -176,11 +176,11 @@ section#life.life {
   border-top: 1px solid var(--life-line);
 }
 #life.life .life-outro {
-  justify-self: end;
+  justify-self: start;
   margin: 0;
   font: 400 clamp(36px, min(9.3vw, 13dvh), 150px)/.92 var(--serif, "Bodoni 72", Didot, "Times New Roman", serif);
   letter-spacing: -.065em;
-  text-align: right;
+  text-align: left;
   white-space: nowrap;
 }
 #life.life .life-outro > span { color: var(--red, #d71920); }
