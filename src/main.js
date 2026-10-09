@@ -176,6 +176,14 @@ document.querySelector('#app').innerHTML = `
 
 `;
 
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+function resetToHome() {
+  history.replaceState(history.state, '', `${location.pathname}${location.search}#home`);
+  document.scrollingElement.scrollTop = 0;
+}
+resetToHome();
+addEventListener('pageshow', resetToHome, { once: true });
+
 // Decode the photograph before revealing its entire art layer, including red.
 // A failed or slow image leaves a neutral, fully usable introduction.
 const hero = document.querySelector('#home');
@@ -279,6 +287,7 @@ new IntersectionObserver(([entry]) => {
 const header = document.querySelector('.site-header');
 const sections = [...document.querySelectorAll('main > section[id]')];
 const navigation = [...document.querySelectorAll('.site-header nav a')];
+const journeySection = document.querySelector('#journey');
 let framePending = false;
 let snapTimer = 0;
 let snapReleaseTimer = 0;
@@ -302,7 +311,18 @@ function updateNavigation() {
   });
 }
 
-function releaseThresholdSnap(suppressScrollEnd = true) {
+function syncSectionHash(section) {
+  const nextHash = `#${section.id}`;
+  if (location.hash !== nextHash) history.replaceState(history.state, '', nextHash);
+}
+
+function settleSectionState(section) {
+  syncSectionHash(section);
+  if (section === journeySection) replayJourneyRoute();
+  else hideJourneyRoute();
+}
+
+function releaseThresholdSnap(suppressScrollEnd = true, commitRoute = true) {
   cancelAnimationFrame(snapFrame);
   snapFrame = 0;
   document.documentElement.classList.remove('is-page-snapping');
@@ -310,13 +330,9 @@ function releaseThresholdSnap(suppressScrollEnd = true) {
   directionSampleY = scrollY;
   clearTimeout(snapReleaseTimer);
   suppressScrollEndUntil = suppressScrollEnd ? performance.now() + 180 : 0;
-  const journey = document.querySelector('#journey');
-  if (Math.abs(scrollY - journey.offsetTop) <= 2) {
-    replayJourneyRoute();
-  } else {
-    const bounds = journey.getBoundingClientRect();
-    if (bounds.bottom <= 0 || bounds.top >= innerHeight) hideJourneyRoute();
-  }
+  if (!commitRoute) return;
+  const aligned = sections.find((section) => Math.abs(scrollY - section.offsetTop) <= 2);
+  if (aligned) settleSectionState(aligned);
 }
 
 function snapToSection(target) {
@@ -330,7 +346,7 @@ function snapToSection(target) {
   const distance = snapTargetY - startY;
   if (Math.abs(distance) <= 2) {
     document.scrollingElement.scrollTop = snapTargetY;
-    if (target.id === 'journey') replayJourneyRoute();
+    settleSectionState(target);
     return;
   }
 
@@ -338,7 +354,8 @@ function snapToSection(target) {
   document.documentElement.classList.add('is-page-snapping');
   if (motionPreference.matches) {
     document.scrollingElement.scrollTop = snapTargetY;
-    snapReleaseTimer = setTimeout(releaseThresholdSnap, 0);
+    settleSectionState(target);
+    snapReleaseTimer = setTimeout(() => releaseThresholdSnap(true, false), 0);
     return;
   }
 
@@ -357,7 +374,8 @@ function snapToSection(target) {
     }
     snapFrame = 0;
     document.scrollingElement.scrollTop = snapTargetY;
-    snapReleaseTimer = setTimeout(releaseThresholdSnap, 120);
+    settleSectionState(target);
+    snapReleaseTimer = setTimeout(() => releaseThresholdSnap(true, false), 120);
   };
   snapFrame = requestAnimationFrame(step);
 }
@@ -387,8 +405,7 @@ function snapAtThreshold() {
     }
   }
   if (Math.abs(scrollY - target.offsetTop) <= 2) {
-    if (target.id === 'journey') replayJourneyRoute();
-    else hideJourneyRoute();
+    settleSectionState(target);
     return;
   }
   snapToSection(target);
@@ -422,14 +439,14 @@ if (supportsScrollEnd) {
       return;
     }
     const reachedTarget = Math.abs(scrollY - snapTargetY) <= 2;
-    releaseThresholdSnap();
+    releaseThresholdSnap(true, reachedTarget);
     if (!reachedTarget) scheduleThresholdSnap();
   }, { passive: true });
 }
 function interruptThresholdSnap() {
   suppressScrollEndUntil = 0;
   if (!snapping) return;
-  releaseThresholdSnap(false);
+  releaseThresholdSnap(false, false);
 }
 addEventListener('wheel', (event) => {
   if (Math.abs(event.deltaY) > .5) scrollDirection = Math.sign(event.deltaY);
