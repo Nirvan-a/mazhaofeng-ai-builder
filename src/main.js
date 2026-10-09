@@ -309,6 +309,7 @@ function updateNavigation() {
     if (active) link.setAttribute('aria-current', 'location');
     else link.removeAttribute('aria-current');
   });
+  if (!snapping && Math.abs(scrollY - current.offsetTop) <= 2) syncSectionHash(current);
 }
 
 function syncSectionHash(section) {
@@ -448,10 +449,6 @@ function interruptThresholdSnap() {
   if (!snapping) return;
   releaseThresholdSnap(false, false);
 }
-addEventListener('wheel', (event) => {
-  if (Math.abs(event.deltaY) > .5) scrollDirection = Math.sign(event.deltaY);
-  interruptThresholdSnap();
-}, { passive: true });
 ['touchstart', 'pointerdown'].forEach((event) =>
   addEventListener(event, interruptThresholdSnap, { passive: true }));
 addEventListener('keydown', (event) => {
@@ -469,28 +466,107 @@ addEventListener('keydown', (event) => {
   interruptThresholdSnap();
 });
 
-const swipeExclusion = '.client-marquee, .life-reel, .life-lightbox, a, button, input, textarea, select, [contenteditable="true"]';
-let pageSwipe = null;
-document.querySelector('main').addEventListener('touchstart', (event) => {
-  if (event.touches.length !== 1 || event.target.closest(swipeExclusion)) return;
-  const touch = event.touches[0];
-  pageSwipe = { id: touch.identifier, x: touch.clientX, y: touch.clientY };
-}, { passive: true });
-addEventListener('touchend', (event) => {
-  const touch = [...event.changedTouches].find((candidate) => candidate.identifier === pageSwipe?.id);
-  if (!pageSwipe || !touch) return;
-  const deltaX = touch.clientX - pageSwipe.x;
-  const deltaY = touch.clientY - pageSwipe.y;
-  pageSwipe = null;
-  if (Math.abs(deltaX) < Math.max(56, innerWidth * .08) || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
-  const currentIndex = sections.reduce((closest, section, index) =>
-    Math.abs(section.offsetTop - scrollY) < Math.abs(sections[closest].offsetTop - scrollY) ? index : closest, 0);
-  const targetIndex = Math.max(0, Math.min(sections.length - 1, currentIndex + (deltaX > 0 ? 1 : -1)));
-  if (targetIndex === currentIndex) return;
-  scrollDirection = deltaX > 0 ? 1 : -1;
+const pageGestureExclusion = '.client-marquee, .life-reel, .life-lightbox, input, textarea, select, [contenteditable="true"]';
+const pageGestureIsExcluded = (target) => target instanceof Element && Boolean(target.closest(pageGestureExclusion));
+const currentSectionIndex = () => sections.reduce((closest, section, index) =>
+  Math.abs(section.offsetTop - scrollY) < Math.abs(sections[closest].offsetTop - scrollY) ? index : closest, 0);
+function moveByPage(direction) {
+  const currentIndex = currentSectionIndex();
+  const targetIndex = Math.max(0, Math.min(sections.length - 1, currentIndex + direction));
+  if (targetIndex === currentIndex) return false;
+  scrollDirection = direction;
   snapToSection(sections[targetIndex]);
+  return true;
+}
+addEventListener('hashchange', () => {
+  const target = sections.find((section) => `#${section.id}` === location.hash);
+  if (target) snapToSection(target);
+});
+
+let pageTouch = null;
+addEventListener('touchstart', (event) => {
+  if (event.touches.length !== 1 || pageGestureIsExcluded(event.target)) {
+    pageTouch = null;
+    return;
+  }
+  const touch = event.touches[0];
+  pageTouch = { id: touch.identifier, x: touch.clientX, y: touch.clientY, axis: null };
 }, { passive: true });
-addEventListener('touchcancel', () => { pageSwipe = null; }, { passive: true });
+addEventListener('touchmove', (event) => {
+  if (event.touches.length !== 1) {
+    pageTouch = null;
+    return;
+  }
+  const touch = [...event.touches].find((candidate) => candidate.identifier === pageTouch?.id);
+  if (!pageTouch || !touch) return;
+  const deltaX = touch.clientX - pageTouch.x;
+  const deltaY = touch.clientY - pageTouch.y;
+  if (!pageTouch.axis && Math.hypot(deltaX, deltaY) > 10) {
+    pageTouch.axis = Math.abs(deltaX) > Math.abs(deltaY) * 1.15 ? 'x' : 'y';
+  }
+  if (pageTouch.axis === 'x' && event.cancelable) event.preventDefault();
+}, { passive: false });
+addEventListener('touchend', (event) => {
+  const touch = [...event.changedTouches].find((candidate) => candidate.identifier === pageTouch?.id);
+  if (!pageTouch || !touch) return;
+  const deltaX = touch.clientX - pageTouch.x;
+  const deltaY = touch.clientY - pageTouch.y;
+  const axis = pageTouch.axis;
+  pageTouch = null;
+  if (Math.abs(deltaX) < Math.max(56, innerWidth * .08) || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
+  if (axis === 'y') return;
+  if (event.cancelable) event.preventDefault();
+  moveByPage(deltaX < 0 ? 1 : -1);
+}, { passive: false });
+addEventListener('touchcancel', () => { pageTouch = null; }, { passive: true });
+
+let pageWheelX = 0;
+let pageWheelY = 0;
+let pageWheelActive = false;
+let pageWheelLocked = false;
+let pageWheelTimer = 0;
+function resetPageWheel() {
+  clearTimeout(pageWheelTimer);
+  pageWheelX = 0;
+  pageWheelY = 0;
+  pageWheelActive = false;
+  pageWheelLocked = false;
+  pageWheelTimer = 0;
+}
+addEventListener('wheel', (event) => {
+  if (event.ctrlKey || pageGestureIsExcluded(event.target)) {
+    resetPageWheel();
+    return;
+  }
+  const horizontal = Math.abs(event.deltaX) > Math.abs(event.deltaY) * 1.15;
+  if (!pageWheelActive && !horizontal) {
+    resetPageWheel();
+    return;
+  }
+  clearTimeout(pageWheelTimer);
+  pageWheelX += event.deltaX;
+  pageWheelY += event.deltaY;
+  if (!pageWheelActive) {
+    if (Math.abs(pageWheelX) < 8 || Math.abs(pageWheelX) <= Math.abs(pageWheelY) * 1.35) {
+      pageWheelTimer = setTimeout(resetPageWheel, 180);
+      return;
+    }
+    pageWheelActive = true;
+    interruptThresholdSnap();
+  }
+  if (event.cancelable) event.preventDefault();
+  const threshold = Math.min(72, Math.max(36, innerWidth * .035));
+  if (!pageWheelLocked && Math.abs(pageWheelX) >= threshold && Math.abs(pageWheelX) > Math.abs(pageWheelY) * 1.2) {
+    pageWheelLocked = true;
+    moveByPage(Math.sign(pageWheelX));
+  }
+  pageWheelTimer = setTimeout(resetPageWheel, 180);
+}, { passive: false });
+addEventListener('wheel', (event) => {
+  if (pageWheelActive || Math.abs(event.deltaY) <= Math.abs(event.deltaX) || Math.abs(event.deltaY) <= .5) return;
+  scrollDirection = Math.sign(event.deltaY);
+  interruptThresholdSnap();
+}, { passive: true });
 addEventListener('resize', updateNavigation);
 updateNavigation();
 
