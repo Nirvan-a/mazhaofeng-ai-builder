@@ -129,7 +129,7 @@ document.querySelector('#app').innerHTML = `
             <span class="work-index">02 <i aria-hidden="true"></i> BEYOND BORDERS</span>
             <div class="work-body">
             <h3>海外<span class="red">商务</span></h3>
-            <p>布基纳法索 · 沙特</p>
+            <p>驻布基纳法索 · 沙特</p>
             </div>
             <div class="work-footer">
               <a class="text-link award-link" href="https://www.seetao.com/details/253446.html" target="_blank" rel="noreferrer">单项目中标 <strong class="red">1 亿美元</strong><span class="sr-only">（查看报道，新窗口打开）</span></a>
@@ -214,7 +214,6 @@ const revealObserver = new IntersectionObserver((entries) => {
   for (const entry of entries) {
     if (!entry.isIntersecting) continue;
     entry.target.classList.add('is-visible');
-    if (entry.target.classList.contains('journey-film')) entry.target.classList.add('route-visible');
     revealObserver.unobserve(entry.target);
   }
 }, { threshold: 0.1 });
@@ -247,8 +246,19 @@ function sizeJourneyRoute() {
 new ResizeObserver(sizeJourneyRoute).observe(film);
 document.fonts.ready.then(sizeJourneyRoute);
 
+function hideJourneyRoute() {
+  film.classList.add('route-resetting');
+  film.classList.remove('route-visible');
+  void film.offsetWidth;
+  film.classList.remove('route-resetting');
+}
+
 function replayJourneyRoute() {
-  if (motionPreference.matches) return;
+  if (motionPreference.matches) {
+    film.classList.add('route-visible');
+    return;
+  }
+  if (film.classList.contains('route-visible')) return;
   film.classList.add('route-resetting');
   film.classList.remove('route-visible');
   void film.offsetWidth;
@@ -257,6 +267,14 @@ function replayJourneyRoute() {
     requestAnimationFrame(() => film.classList.add('route-visible'));
   });
 }
+
+new IntersectionObserver(([entry]) => {
+  if (entry.isIntersecting && entry.intersectionRatio > 0) {
+    if (!film.classList.contains('route-visible')) replayJourneyRoute();
+  } else {
+    hideJourneyRoute();
+  }
+}).observe(document.querySelector('#journey'));
 
 const header = document.querySelector('.site-header');
 const sections = [...document.querySelectorAll('main > section[id]')];
@@ -292,7 +310,13 @@ function releaseThresholdSnap(suppressScrollEnd = true) {
   directionSampleY = scrollY;
   clearTimeout(snapReleaseTimer);
   suppressScrollEndUntil = suppressScrollEnd ? performance.now() + 180 : 0;
-  if (Math.abs(scrollY - document.querySelector('#journey').offsetTop) <= 2) replayJourneyRoute();
+  const journey = document.querySelector('#journey');
+  if (Math.abs(scrollY - journey.offsetTop) <= 2) {
+    replayJourneyRoute();
+  } else {
+    const bounds = journey.getBoundingClientRect();
+    if (bounds.bottom <= 0 || bounds.top >= innerHeight) hideJourneyRoute();
+  }
 }
 
 function snapToSection(target) {
@@ -364,6 +388,7 @@ function snapAtThreshold() {
   }
   if (Math.abs(scrollY - target.offsetTop) <= 2) {
     if (target.id === 'journey') replayJourneyRoute();
+    else hideJourneyRoute();
     return;
   }
   snapToSection(target);
@@ -467,8 +492,8 @@ function initClientMarquee(row) {
   let frame = 0;
   let lastTime = 0;
   let autoPosition = 0;
-  let manualTimer = 0;
   let pointer = null;
+  const supportsRowScrollEnd = 'onscrollend' in row;
 
   const cloneGroup = () => {
     const clone = original.cloneNode(true);
@@ -505,15 +530,6 @@ function initClientMarquee(row) {
     if (enabled) pauses.add(reason);
     else pauses.delete(reason);
     syncPlayback();
-  }
-
-  function holdManual(delay = 500) {
-    pause('manual', true);
-    clearTimeout(manualTimer);
-    manualTimer = setTimeout(() => {
-      autoPosition = row.scrollLeft;
-      pause('manual', false);
-    }, delay);
   }
 
   function wrapManualScroll() {
@@ -554,32 +570,44 @@ function initClientMarquee(row) {
     pointer = null;
     if (row.hasPointerCapture(activePointer.id)) row.releasePointerCapture(activePointer.id);
     row.classList.remove('is-dragging');
-    holdManual(400);
+    if (supportsRowScrollEnd && activePointer.type !== 'mouse' && activePointer.horizontal) pause('native-scroll', true);
+    autoPosition = row.scrollLeft;
+    lastTime = 0;
     pause('pointer', false);
   }
 
+  function resumeNativeScroll() {
+    autoPosition = row.scrollLeft;
+    lastTime = 0;
+    pause('native-scroll', false);
+  }
+
   row.addEventListener('wheel', (event) => {
-    if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) holdManual();
+    if (supportsRowScrollEnd && !event.ctrlKey && Math.abs(event.deltaX) > .5) pause('native-scroll', true);
   }, { passive: true });
+  if (supportsRowScrollEnd) row.addEventListener('scrollend', resumeNativeScroll, { passive: true });
   row.addEventListener('scroll', () => {
     wrapManualScroll();
-    if (pauses.has('manual')) holdManual();
+    autoPosition = row.scrollLeft;
   }, { passive: true });
   row.addEventListener('keydown', (event) => {
     if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
     event.preventDefault();
-    holdManual(400);
     row.scrollLeft += (event.key === 'ArrowRight' ? 1 : -1) * Math.min(260, row.clientWidth * .45);
   });
   row.addEventListener('pointerdown', (event) => {
     if (!event.isPrimary || event.button !== 0) return;
-    pointer = { id: event.pointerId, type: event.pointerType, x: event.clientX, lastX: event.clientX, moved: false };
+    pointer = { id: event.pointerId, type: event.pointerType, x: event.clientX, y: event.clientY, lastX: event.clientX, moved: false, horizontal: false };
     if (event.pointerType === 'mouse') row.setPointerCapture(event.pointerId);
     pause('pointer', true);
   });
   addEventListener('pointermove', (event) => {
-    if (!pointer || event.pointerId !== pointer.id || pointer.type !== 'mouse') return;
-    if (Math.abs(event.clientX - pointer.x) > 5) pointer.moved = true;
+    if (!pointer || event.pointerId !== pointer.id) return;
+    const distanceX = event.clientX - pointer.x;
+    const distanceY = event.clientY - pointer.y;
+    if (Math.hypot(distanceX, distanceY) > 5) pointer.moved = true;
+    if (Math.abs(distanceX) > 5 && Math.abs(distanceX) > Math.abs(distanceY)) pointer.horizontal = true;
+    if (pointer.type !== 'mouse') return;
     if (!pointer.moved) return;
     event.preventDefault();
     row.scrollLeft -= event.clientX - pointer.lastX;

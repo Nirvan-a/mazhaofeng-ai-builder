@@ -48,25 +48,27 @@ export function renderLife(photos) {
       ` : '<p class="life-empty">暂时没有可展示的生活照片。</p>'}
       <footer class="life-ending" aria-label="结束语">
         <p class="life-outro">KEEP EXPLORING<span>.</span></p>
-        <button class="life-wechat" type="button" data-wechat-copy="M15378955467" aria-label="复制微信号 M15378955467">
-          <svg fill="none" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke="currentColor" stroke-linejoin="round" d="M16.5 9.5c0 -3.314 -3.358 -6 -7.5 -6 -4.142 0 -7.5 2.686 -7.5 6 0 1.891 1.094 3.578 2.803 4.678L4 17l3.302 -1.654a9.35 9.35 0 0 0 3.288 0.02" stroke-width="1"></path>
-            <path stroke="currentColor" stroke-linejoin="round" d="M6.5 8.5a0.5 0.5 0 0 1 0 -1" stroke-width="1"></path>
-            <path stroke="currentColor" stroke-linejoin="round" d="M6.5 8.5a0.5 0.5 0 0 0 0 -1" stroke-width="1"></path>
-            <path stroke="currentColor" stroke-linejoin="round" d="M11.5 8.5a0.5 0.5 0 0 1 0 -1" stroke-width="1"></path>
-            <path stroke="currentColor" stroke-linejoin="round" d="M11.5 8.5a0.5 0.5 0 0 0 0 -1" stroke-width="1"></path>
-            <path stroke="currentColor" stroke-linejoin="round" d="M14.25 13.5a0.25 0.25 0 1 1 0 -0.5" stroke-width="1"></path>
-            <path stroke="currentColor" stroke-linejoin="round" d="M14.25 13.5a0.25 0.25 0 1 0 0 -0.5" stroke-width="1"></path>
-            <path stroke="currentColor" stroke-linejoin="round" d="M18.75 13.5a0.25 0.25 0 1 1 0 -0.5" stroke-width="1"></path>
-            <path stroke="currentColor" stroke-linejoin="round" d="M18.75 13.5a0.25 0.25 0 1 0 0 -0.5" stroke-width="1"></path>
-            <path stroke="currentColor" stroke-linejoin="round" d="M10.5 14.5c0 2.761 2.686 5 6 5 0.34 0 0.675 -0.024 1 -0.07L21 21l-0.5 -2.773c1.227 -0.916 2 -2.246 2 -3.727 0 -2.761 -2.686 -5 -6 -5s-6 2.239 -6 5Z" stroke-width="1"></path>
-          </svg>
-          <span class="life-copy-toast" role="status" aria-live="polite"></span>
-        </button>
+        <div class="life-contact">
+          <button class="life-wechat" type="button" data-wechat-copy="M15378955467" aria-label="复制微信号 M15378955467">
+            <svg fill="none" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke="currentColor" stroke-linejoin="round" d="M16.5 9.5c0 -3.314 -3.358 -6 -7.5 -6 -4.142 0 -7.5 2.686 -7.5 6 0 1.891 1.094 3.578 2.803 4.678L4 17l3.302 -1.654a9.35 9.35 0 0 0 3.288 0.02" stroke-width="1"></path>
+              <path stroke="currentColor" stroke-linejoin="round" d="M6.5 8.5a0.5 0.5 0 0 1 0 -1" stroke-width="1"></path>
+              <path stroke="currentColor" stroke-linejoin="round" d="M6.5 8.5a0.5 0.5 0 0 0 0 -1" stroke-width="1"></path>
+              <path stroke="currentColor" stroke-linejoin="round" d="M11.5 8.5a0.5 0.5 0 0 1 0 -1" stroke-width="1"></path>
+              <path stroke="currentColor" stroke-linejoin="round" d="M11.5 8.5a0.5 0.5 0 0 0 0 -1" stroke-width="1"></path>
+              <path stroke="currentColor" stroke-linejoin="round" d="M14.25 13.5a0.25 0.25 0 1 1 0 -0.5" stroke-width="1"></path>
+              <path stroke="currentColor" stroke-linejoin="round" d="M14.25 13.5a0.25 0.25 0 1 0 0 -0.5" stroke-width="1"></path>
+              <path stroke="currentColor" stroke-linejoin="round" d="M18.75 13.5a0.25 0.25 0 1 1 0 -0.5" stroke-width="1"></path>
+              <path stroke="currentColor" stroke-linejoin="round" d="M18.75 13.5a0.25 0.25 0 1 0 0 -0.5" stroke-width="1"></path>
+              <path stroke="currentColor" stroke-linejoin="round" d="M10.5 14.5c0 2.761 2.686 5 6 5 0.34 0 0.675 -0.024 1 -0.07L21 21l-0.5 -2.773c1.227 -0.916 2 -2.246 2 -3.727 0 -2.761 -2.686 -5 -6 -5s-6 2.239 -6 5Z" stroke-width="1"></path>
+            </svg>
+            <span class="life-copy-toast" role="status" aria-live="polite"></span>
+          </button>
+          <span class="life-invite">期待认识新同学 ⬆️</span>
+        </div>
         <div class="life-colophon">
           <p class="life-signature">马兆峰 <span>/ AI BUILDER</span></p>
           <span class="life-location">Shanghai</span>
-          <a class="life-back" href="#home">期待认识新同学 ⬆️</a>
         </div>
       </footer>
       ${items.length ? `
@@ -138,6 +140,7 @@ export function initLife(photos) {
   const previewImage = dialog.querySelector('[data-life-preview]');
   const fullImage = dialog.querySelector('[data-life-full]');
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const supportsReelScrollEnd = 'onscrollend' in reel;
   const copies = [];
   const pauses = new Set(['layout', 'offscreen']);
   let span = 0;
@@ -145,7 +148,6 @@ export function initLife(photos) {
   let frame = 0;
   let lastTime = 0;
   let autoPosition = 0;
-  let manualTimer = 0;
   let pointer = null;
   let suppressClickUntil = 0;
   let current = 0;
@@ -187,15 +189,6 @@ export function initLife(photos) {
     if (enabled) pauses.add(reason);
     else pauses.delete(reason);
     syncPlayback();
-  }
-
-  function holdManual(delay = 120) {
-    pause('manual', true);
-    window.clearTimeout(manualTimer);
-    manualTimer = window.setTimeout(() => {
-      autoPosition = reel.scrollLeft;
-      pause('manual', false);
-    }, delay);
   }
 
   function wrapScroll() {
@@ -333,28 +326,38 @@ export function initLife(photos) {
     if (activePointer.moved || event.type === 'pointercancel') suppressClickUntil = performance.now() + 500;
     if (reel.hasPointerCapture(activePointer.id)) reel.releasePointerCapture(activePointer.id);
     root.classList.remove('life-is-dragging');
-    holdManual(80);
+    if (supportsReelScrollEnd && activePointer.type !== 'mouse' && activePointer.horizontal) pause('native-scroll', true);
+    autoPosition = reel.scrollLeft;
+    lastTime = 0;
     pause('pointer', false);
   }
 
-  listen(reel, 'wheel', () => holdManual(120), { passive: true });
+  function resumeNativeScroll() {
+    autoPosition = reel.scrollLeft;
+    lastTime = 0;
+    pause('native-scroll', false);
+  }
+
+  listen(reel, 'wheel', (event) => {
+    if (supportsReelScrollEnd && !event.ctrlKey && Math.abs(event.deltaX) > .5) pause('native-scroll', true);
+  }, { passive: true });
+  if (supportsReelScrollEnd) listen(reel, 'scrollend', resumeNativeScroll, { passive: true });
   listen(reel, 'scroll', () => {
     wrapScroll();
-    if (pauses.has('manual')) holdManual(120);
+    autoPosition = reel.scrollLeft;
   }, { passive: true });
   listen(reel, 'keydown', (event) => {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
-      holdManual(100);
       reel.scrollLeft += (event.key === 'ArrowLeft' ? -1 : 1) * reel.clientWidth * .6;
     }
   });
   listen(reel, 'dragstart', (event) => event.preventDefault());
   listen(reel, 'pointerdown', (event) => {
     if (!event.isPrimary || event.button !== 0) return;
-    pointer = { id: event.pointerId, type: event.pointerType, x: event.clientX, y: event.clientY, lastX: event.clientX, moved: false };
-    reel.setPointerCapture(event.pointerId);
+    pointer = { id: event.pointerId, type: event.pointerType, x: event.clientX, y: event.clientY, lastX: event.clientX, moved: false, horizontal: false };
+    if (event.pointerType === 'mouse') reel.setPointerCapture(event.pointerId);
     pause('pointer', true);
   });
   listen(window, 'pointermove', (event) => {
@@ -362,6 +365,7 @@ export function initLife(photos) {
     const distanceX = event.clientX - pointer.x;
     const distanceY = event.clientY - pointer.y;
     if (Math.hypot(distanceX, distanceY) > 8) pointer.moved = true;
+    if (Math.abs(distanceX) > 8 && Math.abs(distanceX) > Math.abs(distanceY)) pointer.horizontal = true;
     if (pointer.type === 'mouse' && pointer.moved && Math.abs(distanceX) > Math.abs(distanceY)) {
       if (!reel.hasPointerCapture(pointer.id)) reel.setPointerCapture(pointer.id);
       event.preventDefault();
@@ -421,7 +425,6 @@ export function initLife(photos) {
     unlockBody();
     controller.abort();
     cancelAnimationFrame(frame);
-    window.clearTimeout(manualTimer);
     window.clearTimeout(copyTimer);
     resizeObserver.disconnect();
     intersectionObserver.disconnect();

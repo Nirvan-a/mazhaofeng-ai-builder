@@ -182,16 +182,26 @@ section#life.life {
   white-space: nowrap;
 }
 #life.life .life-outro > span { color: var(--red, #d71920); }
-#life.life .life-wechat {
-  position: relative;
+#life.life .life-contact {
   grid-column: 2;
+  grid-row: 1 / 3;
   align-self: end;
   justify-self: end;
   display: grid;
-  place-items: center;
+  justify-items: center;
+  gap: 3px;
   width: var(--life-contact-width);
-  height: 44px;
-  margin: 0 0 .25em;
+  color: var(--life-muted);
+  font: 400 10px/1.5 var(--mono, "SFMono-Regular", Consolas, monospace);
+  letter-spacing: .035em;
+}
+#life.life .life-wechat {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 34px;
+  margin: 0;
   padding: 0;
   border: 0;
   background: transparent;
@@ -223,8 +233,9 @@ section#life.life {
   opacity: 1;
   transform: translate(-50%, 0);
 }
+#life.life .life-invite { white-space: nowrap; }
 #life.life .life-colophon {
-  grid-column: 1 / -1;
+  grid-column: 1;
   display: flex;
   align-items: center;
   gap: 32px;
@@ -236,17 +247,6 @@ section#life.life {
 #life.life .life-signature { margin: 0; color: var(--ink, #111110); }
 #life.life .life-signature > span { margin-left: 6px; color: var(--life-muted); }
 #life.life .life-location { margin-left: auto; }
-#life.life .life-back {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  width: var(--life-contact-width);
-  min-height: 28px;
-  color: inherit;
-  text-decoration: none;
-}
-#life.life .life-back:hover { color: var(--ink, #111110); }
 #life.life .life-empty { align-self: center; margin-inline: var(--gutter); color: var(--life-muted); }
 #life.life :is(a, button):focus-visible { outline: 2px solid var(--red, #d71920); outline-offset: 3px; }
 #life.life .life-reel:focus-visible { outline: 2px solid var(--red, #d71920); outline-offset: -2px; }
@@ -284,7 +284,7 @@ section#life.life {
 @media (max-width: 900px) {
   #life.life .life-ending { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   #life.life .life-outro { grid-column: 1; }
-  #life.life .life-wechat { grid-column: 1; grid-row: 2; margin: 0; }
+  #life.life .life-contact { grid-column: 1; grid-row: 2; }
   #life.life .life-colophon {
     grid-column: 1;
     grid-row: 3;
@@ -306,7 +306,6 @@ section#life.life {
   #life.life .life-colophon { grid-column: 1; grid-row: 3; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 0 18px; font-size: 9px; text-align: left; }
   #life.life .life-signature { width: 100%; }
   #life.life .life-location { margin-left: auto; }
-  #life.life .life-back { min-height: 26px; gap: 8px; }
   #life.life .life-lightbox-shell { padding: 12px; }
 }
 
@@ -325,11 +324,10 @@ section#life.life {
   #life.life .life-reel { padding-left: 0; }
   #life.life .life-ending { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 24px; padding-top: 10px; }
   #life.life .life-outro { grid-column: 1; font-size: clamp(28px, 10dvh, 46px); }
-  #life.life .life-wechat { grid-column: 2; grid-row: 1; margin-bottom: 0; }
-  #life.life .life-colophon { grid-column: 1 / -1; grid-row: 2; flex-direction: row; align-items: center; flex-wrap: nowrap; text-align: left; }
+  #life.life .life-contact { grid-column: 2; grid-row: 1 / 3; }
+  #life.life .life-colophon { grid-column: 1; grid-row: 2; flex-direction: row; align-items: center; flex-wrap: nowrap; text-align: left; }
   #life.life .life-signature { width: auto; }
   #life.life .life-location { margin-left: auto; }
-  #life.life .life-back { min-height: 24px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
