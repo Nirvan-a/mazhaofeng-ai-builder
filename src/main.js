@@ -4,7 +4,7 @@ import { renderLife, initLife } from './life.js';
 
 const clients = [
   { name: '布基纳法索电力公司', logo: clientLogos.sonabel, brand: 'sonabel', width: 152, height: 88 },
-  { name: '沙特电力公司', logo: clientLogos.saudiEnergy, brand: 'saudi-energy', width: 135, height: 88 },
+  { name: '沙特电力公司', logo: clientLogos.saudiEnergy, brand: 'saudi-energy', width: 286, height: 88 },
   { name: '中国铜业有限公司', logo: clientLogos.chinaCopper, brand: 'china-copper', width: 457, height: 88 },
   { name: '方太集团', logo: clientLogos.fotile, brand: 'fotile', width: 193, height: 56 },
   { name: '瑞幸咖啡', logo: clientLogos.luckin, brand: 'luckin', width: 333, height: 88 },
@@ -156,7 +156,7 @@ document.querySelector('#app').innerHTML = `
         <h2 id="clients-title">SELECTED CLIENTS <span>/</span> 服务企业</h2>
         <i aria-hidden="true"></i>
       </div>
-        <div class="client-marquee" tabindex="0" aria-label="服务企业，可横向滚动">
+        <div class="client-marquee" aria-label="服务企业，自动循环展示">
           <div class="client-track">${clientGroup(clients)}${clientGroup(clients, true)}</div>
         </div>
       </aside>
@@ -377,25 +377,3 @@ function sizeClientLoops() {
 new ResizeObserver(sizeClientLoops).observe(clientSection);
 document.fonts.ready.then(sizeClientLoops);
 sizeClientLoops();
-
-// Temporarily expose native horizontal browsing; auto motion resumes on exit.
-clientRows.forEach((row) => {
-  let resumeTimer;
-  const resume = () => {
-    row.classList.remove('is-manual');
-    row.scrollLeft = 0;
-  };
-  const useManualScrolling = () => {
-    row.classList.add('is-manual');
-    clearTimeout(resumeTimer);
-  };
-  row.addEventListener('touchstart', useManualScrolling, { passive: true });
-  row.addEventListener('touchend', () => { resumeTimer = setTimeout(resume, 3000); }, { passive: true });
-  row.addEventListener('blur', resume);
-  row.addEventListener('keydown', (event) => {
-    if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
-    event.preventDefault();
-    useManualScrolling();
-    row.scrollBy({ left: event.key === 'ArrowRight' ? 240 : -240, behavior: motionPreference.matches ? 'instant' : 'smooth' });
-  });
-});

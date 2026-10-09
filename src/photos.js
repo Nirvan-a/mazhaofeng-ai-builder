@@ -13,7 +13,7 @@ export const scenes = {
 
 export const clientLogos = {
   sonabel: `${storage}/1878596284398682.png`,
-  saudiEnergy: `${storage}/1878596357503072.png`,
+  saudiEnergy: `${storage}/1878597636351035.png`,
   chinaCopper: `${storage}/1878596357503088.png`,
   fotile: `${storage}/1878596308437018.png`,
   luckin: `${storage}/1878596167902297.png`,
