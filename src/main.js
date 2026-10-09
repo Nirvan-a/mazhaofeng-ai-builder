@@ -32,6 +32,10 @@ const clientGroup = (items, duplicate = false) => `
       </span><i aria-hidden="true"></i>`).join('')}
   </div>`;
 
+const heroCharacters = (text, startIndex = 0, highlighted = []) => [...text]
+  .map((character, index) => `<span class="hero-char${highlighted.includes(index) ? ' red' : ''}" style="--char-index:${startIndex + index}">${character === ' ' ? '&nbsp;' : character}</span>`)
+  .join('');
+
 document.querySelector('#app').innerHTML = `
   <a class="skip-link" href="#work">跳至做过的事情</a>
   <header class="site-header">
@@ -54,8 +58,13 @@ document.querySelector('#app').innerHTML = `
       </div>
       <div class="hero-copy">
         <span class="hero-rule" aria-hidden="true"></span>
-        <h1 id="hero-title"><span>让<span class="red">好奇</span>带路</span><span>在每一次跨界中生长</span></h1>
-        <p class="hero-description">以商业理解世界，用代码创造答案</p>
+        <h1 id="hero-title" aria-label="让好奇带路，在每一次跨界中生长">
+          <span class="hero-line" aria-hidden="true">${heroCharacters('让好奇带路', 0, [1, 2])}</span>
+          <span class="hero-line" aria-hidden="true">${heroCharacters('在每一次跨界中生长', 6)}</span>
+        </h1>
+        <p class="hero-description" aria-label="以商业理解世界，用代码创造答案">
+          <span aria-hidden="true">${heroCharacters('以商业理解世界，用代码创造答案', 17)}</span>
+        </p>
       </div>
       <div class="hero-bottom">
         <div class="chapter-label"><b>01</b><i aria-hidden="true"></i><span>INTRODUCTION</span></div>
@@ -223,7 +232,7 @@ function sizeJourneyRoute() {
   route.setAttribute('viewBox', `0 0 ${bounds.width} ${bounds.height}`);
   const rise = Math.min(38, bounds.height * .1);
   const edge = Math.min(56, Math.max(28, bounds.width * .04));
-  let path = `M${edge} ${points[0].y + 12} Q${edge + 12} ${points[0].y} ${points[0].x} ${points[0].y}`;
+  let path = `M${points[0].x} ${points[0].y}`;
   points.slice(1).forEach((point, index) => {
     const previous = points[index];
     const third = (point.x - previous.x) / 3;
@@ -255,10 +264,12 @@ const navigation = [...document.querySelectorAll('.site-header nav a')];
 let framePending = false;
 let snapTimer = 0;
 let snapReleaseTimer = 0;
+let snapFrame = 0;
 let snapping = false;
 let scrollDirection = 1;
 let directionSampleY = scrollY;
 let snapTargetY = scrollY;
+let suppressScrollEndUntil = 0;
 const supportsScrollEnd = 'onscrollend' in window;
 function updateNavigation() {
   framePending = false;
@@ -273,11 +284,58 @@ function updateNavigation() {
   });
 }
 
-function releaseThresholdSnap() {
+function releaseThresholdSnap(suppressScrollEnd = true) {
+  cancelAnimationFrame(snapFrame);
+  snapFrame = 0;
+  document.documentElement.classList.remove('is-page-snapping');
   snapping = false;
   directionSampleY = scrollY;
   clearTimeout(snapReleaseTimer);
+  suppressScrollEndUntil = suppressScrollEnd ? performance.now() + 180 : 0;
   if (Math.abs(scrollY - document.querySelector('#journey').offsetTop) <= 2) replayJourneyRoute();
+}
+
+function snapToSection(target) {
+  if (!target) return;
+  clearTimeout(snapTimer);
+  clearTimeout(snapReleaseTimer);
+  cancelAnimationFrame(snapFrame);
+  snapFrame = 0;
+  snapTargetY = target.offsetTop;
+  const startY = scrollY;
+  const distance = snapTargetY - startY;
+  if (Math.abs(distance) <= 2) {
+    document.scrollingElement.scrollTop = snapTargetY;
+    if (target.id === 'journey') replayJourneyRoute();
+    return;
+  }
+
+  snapping = true;
+  document.documentElement.classList.add('is-page-snapping');
+  if (motionPreference.matches) {
+    document.scrollingElement.scrollTop = snapTargetY;
+    snapReleaseTimer = setTimeout(releaseThresholdSnap, 0);
+    return;
+  }
+
+  const duration = Math.min(800, 620 + Math.abs(distance) / Math.max(1, innerHeight) * 180);
+  const startedAt = performance.now();
+  const easeInOutCubic = (progress) => progress < .5
+    ? 4 * progress ** 3
+    : 1 - (-2 * progress + 2) ** 3 / 2;
+
+  const step = (time) => {
+    const progress = Math.min(1, (time - startedAt) / duration);
+    document.scrollingElement.scrollTop = startY + distance * easeInOutCubic(progress);
+    if (progress < 1) {
+      snapFrame = requestAnimationFrame(step);
+      return;
+    }
+    snapFrame = 0;
+    document.scrollingElement.scrollTop = snapTargetY;
+    snapReleaseTimer = setTimeout(releaseThresholdSnap, 120);
+  };
+  snapFrame = requestAnimationFrame(step);
 }
 
 function snapAtThreshold() {
@@ -308,10 +366,7 @@ function snapAtThreshold() {
     if (target.id === 'journey') replayJourneyRoute();
     return;
   }
-  snapping = true;
-  snapTargetY = target.offsetTop;
-  scrollTo({ top: snapTargetY, behavior: motionPreference.matches ? 'instant' : 'smooth' });
-  snapReleaseTimer = setTimeout(releaseThresholdSnap, 1000);
+  snapToSection(target);
 }
 
 function scheduleThresholdSnap() {
@@ -335,7 +390,9 @@ addEventListener('scroll', () => {
 if (supportsScrollEnd) {
   addEventListener('scrollend', () => {
     clearTimeout(snapTimer);
+    if (snapping && snapFrame) return;
     if (!snapping) {
+      if (performance.now() < suppressScrollEndUntil) return;
       snapAtThreshold();
       return;
     }
@@ -345,9 +402,9 @@ if (supportsScrollEnd) {
   }, { passive: true });
 }
 function interruptThresholdSnap() {
+  suppressScrollEndUntil = 0;
   if (!snapping) return;
-  scrollTo({ top: scrollY, behavior: 'instant' });
-  releaseThresholdSnap();
+  releaseThresholdSnap(false);
 }
 addEventListener('wheel', (event) => {
   if (Math.abs(event.deltaY) > .5) scrollDirection = Math.sign(event.deltaY);
@@ -386,15 +443,10 @@ addEventListener('touchend', (event) => {
   if (Math.abs(deltaX) < Math.max(56, innerWidth * .08) || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
   const currentIndex = sections.reduce((closest, section, index) =>
     Math.abs(section.offsetTop - scrollY) < Math.abs(sections[closest].offsetTop - scrollY) ? index : closest, 0);
-  const targetIndex = Math.max(0, Math.min(sections.length - 1, currentIndex + (deltaX < 0 ? 1 : -1)));
+  const targetIndex = Math.max(0, Math.min(sections.length - 1, currentIndex + (deltaX > 0 ? 1 : -1)));
   if (targetIndex === currentIndex) return;
-  clearTimeout(snapTimer);
-  clearTimeout(snapReleaseTimer);
-  scrollDirection = deltaX < 0 ? 1 : -1;
-  snapping = true;
-  snapTargetY = sections[targetIndex].offsetTop;
-  scrollTo({ top: snapTargetY, behavior: motionPreference.matches ? 'instant' : 'smooth' });
-  snapReleaseTimer = setTimeout(releaseThresholdSnap, 1000);
+  scrollDirection = deltaX > 0 ? 1 : -1;
+  snapToSection(sections[targetIndex]);
 }, { passive: true });
 addEventListener('touchcancel', () => { pageSwipe = null; }, { passive: true });
 addEventListener('resize', updateNavigation);
