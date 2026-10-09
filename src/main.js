@@ -2,6 +2,12 @@ import './styles.css';
 
 const ASSET_ROOT = '/app/app_17fqurz8tq0/runtime/api/v1/storage/object/bucket_aadkzdtnjwiby';
 
+const approvedVisuals = {
+  hero: `${ASSET_ROOT}/1878580067109017.png`,
+  journey: `${ASSET_ROOT}/1878579962834955.png`,
+  work: `${ASSET_ROOT}/1878579962834971.png`
+};
+
 const clients = [
   '布基纳法索电力公司', '沙特电力公司', '中国铜业集团', '方太集团',
   '瑞幸咖啡', '上汽集团', '远景能源', '某军工集团'
@@ -29,7 +35,7 @@ const photoGroup = (items, hidden = false) => `
   </div>`;
 
 document.querySelector('#app').innerHTML = `
-  <header class="site-header" aria-label="主导航">
+  <header class="site-header mobile-only" aria-label="主导航">
     <a class="brand" href="#home">马兆峰</a>
     <nav>
       <a href="#journey">Journey</a>
@@ -40,62 +46,39 @@ document.querySelector('#app').innerHTML = `
   </header>
 
   <main>
-    <section id="home" class="hero section-shell" aria-labelledby="hero-title">
-      <img class="hero-bg" src="${ASSET_ROOT}/1878579210497192.png" alt="" fetchpriority="high" />
-      <div class="hero-copy reveal">
-        <p class="eyebrow">AI BUILDER / SHANGHAI</p>
-        <h1 id="hero-title">把复杂 AI，<br />做成可交付的<br />业务系统</h1>
-        <div class="hero-actions">
-          <a class="primary-link" href="#journey">向下探索 <span>↓</span></a>
-          <a href="https://github.com/Nirvan-a" target="_blank" rel="noreferrer">GitHub ↗</a>
-        </div>
+    <section id="home" class="approved-section approved-hero" aria-labelledby="hero-title">
+      <img class="approved-visual" src="${approvedVisuals.hero}" alt="" fetchpriority="high" />
+      <div class="sr-only">
+        <h1 id="hero-title">把复杂 AI，做成可交付的业务系统</h1>
+        <p>马兆峰，AI Builder，上海。</p>
       </div>
-      <div class="chapter-index" aria-hidden="true"><b>01</b><span>02</span><span>03</span><span>04</span></div>
+      <a class="visual-hotspot hero-explore" href="#journey" aria-label="向下探索 THE JOURNEY"></a>
+      <a class="visual-hotspot hero-nav-02" href="#journey" aria-label="前往 THE JOURNEY"></a>
+      <a class="visual-hotspot hero-nav-03" href="#work" aria-label="前往做过的事情"></a>
     </section>
 
-    <section id="journey" class="journey section-shell" aria-labelledby="journey-title">
-      <div class="section-head reveal">
-        <div><span class="chapter-no">02</span><p class="eyebrow">THE JOURNEY</p></div>
-        <h2 id="journey-title">一条并不笔直的路</h2>
+    <section id="journey" class="approved-section" aria-labelledby="journey-title">
+      <img class="approved-visual" src="${approvedVisuals.journey}" alt="" loading="eager" />
+      <div class="sr-only">
+        <h2 id="journey-title">THE JOURNEY，一条并不笔直的路</h2>
+        <ol><li>学习：从商科出发</li><li>创造：用代码表达想法</li><li>远行：去陌生现场理解业务</li><li>落地：让 AI 真正进入工作</li></ol>
         <p>兴趣让我开始，好奇让我远行。</p>
       </div>
-      <div class="journey-stage">
-        <div class="route-line" aria-hidden="true"><span></span></div>
-        <article class="journey-step reveal"><b>01</b><h3>学习</h3><p>从商科出发，建立理解业务的底层视角。</p></article>
-        <article class="journey-step reveal"><b>02</b><h3>创造</h3><p>自学编程，用代码把想法变成真实产品。</p></article>
-        <article class="journey-step reveal"><b>03</b><h3>远行</h3><p>进入非洲与沙特，在陌生现场理解商业。</p></article>
-        <article class="journey-step reveal"><b>04</b><h3>落地</h3><p>回到企业一线，让 AI 真正进入工作。</p></article>
-      </div>
     </section>
 
-    <section id="work" class="work section-shell" aria-labelledby="work-title">
-      <div class="section-head reveal">
-        <div><span class="chapter-no">03</span><p class="eyebrow">WHAT I HAVE DONE</p></div>
+    <section id="work" class="approved-section" aria-labelledby="work-title">
+      <img class="approved-visual" src="${approvedVisuals.work}" alt="" loading="lazy" />
+      <div class="sr-only">
         <h2 id="work-title">做过的事情</h2>
-        <p>从工程、业务到 AI 落地。</p>
+        <ol>
+          <li>商科转码，7个月拿下阿里开发</li>
+          <li>海外商务拓展，非洲与沙特，单项目中标1亿美元</li>
+          <li>AI产品，智能问数与DeepResearch，Skill前时代的工作流实践</li>
+          <li>AI方案顾问，Agent服务与AI项目落地</li>
+        </ol>
+        <p id="clients-title">服务企业：${clients.join('、')}</p>
       </div>
-      <div class="work-grid">
-        <article class="work-card reveal">
-          <span>01 / ENGINEERING</span><h3>商科转码</h3><strong>7个月</strong><p>拿下阿里开发，完成从商业到工程的第一次跨越。</p>
-          <a href="https://github.com/Nirvan-a" target="_blank" rel="noreferrer">查看 GitHub ↗</a>
-        </article>
-        <article class="work-card work-card-dark reveal">
-          <span>02 / BUSINESS</span><h3>海外商务拓展</h3><strong>1亿美元</strong><p>深入非洲与沙特市场，推动单项目中标。</p>
-        </article>
-        <article class="work-card work-card-line reveal">
-          <span>03 / AI PRODUCT</span><h3>AI 产品</h3><strong>0 → 1</strong><p>手搓智能问数与 DeepResearch 工作流，发生在 Skill 前时代。</p>
-        </article>
-        <article class="work-card work-card-red reveal">
-          <span>04 / CONSULTING</span><h3>AI 方案顾问</h3><strong>Agent</strong><p>服务企业 Agent 建设与 AI 项目落地。</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="clients" aria-labelledby="clients-title">
-      <div class="client-label"><span id="clients-title">SERVICE EXPERIENCE</span><b>曾服务</b></div>
-      <div class="marquee" tabindex="0" aria-label="服务企业滚动列表">
-        <div class="marquee-track">${clientGroup()}${clientGroup(true)}</div>
-      </div>
+      <a class="visual-hotspot work-github" href="https://github.com/Nirvan-a" target="_blank" rel="noreferrer" aria-label="打开马兆峰的 GitHub"></a>
     </section>
 
     <section id="life" class="life section-shell" aria-labelledby="life-title">
