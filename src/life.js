@@ -64,7 +64,7 @@ export function renderLife(photos) {
             </svg>
             <span class="life-copy-toast" role="status" aria-live="polite"></span>
           </button>
-          <span class="life-invite">期待认识新同学 ⬆️</span>
+          <span class="life-invite">期待认识新同学！！</span>
         </div>
         <div class="life-colophon">
           <p class="life-signature">马兆峰 <span>/ AI BUILDER</span></p>
@@ -339,7 +339,7 @@ export function initLife(photos) {
   }
 
   listen(reel, 'wheel', (event) => {
-    if (supportsReelScrollEnd && !event.ctrlKey && Math.abs(event.deltaX) > .5) pause('native-scroll', true);
+    if (supportsReelScrollEnd && !event.ctrlKey && Math.abs(event.deltaX) > Math.abs(event.deltaY) && Math.abs(event.deltaX) > .5) pause('native-scroll', true);
   }, { passive: true });
   if (supportsReelScrollEnd) listen(reel, 'scrollend', resumeNativeScroll, { passive: true });
   listen(reel, 'scroll', () => {

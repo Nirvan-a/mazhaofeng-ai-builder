@@ -17,7 +17,7 @@ const steps = [
   { title: '学习', date: '2020 — 2024', organization: '华中科技大学', role: '国际商务 &amp; 英语双学位', text: '从商科出发', image: scenes.library, note: 'LEARN' },
   { title: '创造', date: '2022 — 2023', organization: '阿里巴巴 &amp; Cider', role: 'iOS 工程师', text: '用代码表达想法', image: scenes.coding, note: 'BUILD' },
   { title: '商业', date: '2024 — 2025', organization: '特变电工', role: '市场经理', text: '在驻外现场理解业务', image: scenes.travel, note: 'EXPLORE' },
-  { title: '实践', date: '2025 — 至今', organization: '云问 &amp; 字节跳动', text: '让 AI 真正进入工作', image: scenes.collaboration, note: 'DELIVER' },
+  { title: '实践', date: '2025 — 至今', organization: '云问 &amp; 字节跳动', role: 'AI产品 &amp; 解决方案', text: '让 AI 真正进入工作', image: scenes.collaboration, note: 'DELIVER' },
 ];
 
 const clientGroup = (items, duplicate = false) => `
@@ -600,7 +600,7 @@ function initClientMarquee(row) {
   }
 
   row.addEventListener('wheel', (event) => {
-    if (supportsRowScrollEnd && !event.ctrlKey && Math.abs(event.deltaX) > .5) pause('native-scroll', true);
+    if (supportsRowScrollEnd && !event.ctrlKey && Math.abs(event.deltaX) > Math.abs(event.deltaY) && Math.abs(event.deltaX) > .5) pause('native-scroll', true);
   }, { passive: true });
   if (supportsRowScrollEnd) row.addEventListener('scrollend', resumeNativeScroll, { passive: true });
   row.addEventListener('scroll', () => {
