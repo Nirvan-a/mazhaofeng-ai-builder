@@ -6,6 +6,7 @@ export const scenes = {
   hero: `${storage}/1878582012815379.webp`,
   library: `${storage}/1878582004672643.webp`,
   coding: `${storage}/1878582012815411.webp`,
+  travel: `${storage}/1878584752162819.webp`,
   collaboration: `${storage}/1878582016497668.webp`,
   architecture: `${storage}/1878582012815395.webp`,
 };
