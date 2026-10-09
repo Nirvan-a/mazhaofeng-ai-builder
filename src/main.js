@@ -42,20 +42,13 @@ document.querySelector('#app').innerHTML = `
       </div>
       <div class="hero-copy">
         <span class="hero-rule" aria-hidden="true"></span>
-        <h1 id="hero-title"><span>让 AI<span class="red">，</span></span><span>解决真实问题</span></h1>
-        <p class="hero-description">从业务出发，用代码与 AI 把想法落地。</p>
+        <h1 id="hero-title"><span>让<span class="red">好奇</span>带路</span><span>在每一次跨界中生长</span></h1>
+        <p class="hero-description">以商业理解世界，用代码创造答案</p>
       </div>
       <div class="hero-bottom">
         <div class="chapter-label"><b>01</b><i aria-hidden="true"></i><span>INTRODUCTION</span></div>
-        <a class="explore-link" href="#journey"><span class="explore-dot" aria-hidden="true">↓</span><span>向下探索 <small>SCROLL TO EXPLORE</small></span></a>
         <p class="hero-footnote">BUSINESS → CODE → THE WORLD → AI</p>
       </div>
-      <nav class="chapter-rail" aria-label="章节导航">
-        <a href="#home" aria-label="01 首页" aria-current="location">01</a>
-        <a href="#journey" aria-label="02 人生旅程">02</a>
-        <a href="#work" aria-label="03 做过的事情">03</a>
-        <a href="#life" aria-label="04 生活剪影">04</a>
-      </nav>
     </section>
 
     <section id="journey" class="page journey" aria-labelledby="journey-title">
@@ -198,7 +191,7 @@ document.fonts.ready.then(sizeJourneyRoute);
 
 const header = document.querySelector('.site-header');
 const sections = [...document.querySelectorAll('main > section[id]')];
-const navigation = [...document.querySelectorAll('.site-header nav a, .chapter-rail a')];
+const navigation = [...document.querySelectorAll('.site-header nav a')];
 let framePending = false;
 function updateNavigation() {
   framePending = false;
