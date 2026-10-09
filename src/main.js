@@ -124,7 +124,7 @@ document.querySelector('#app').innerHTML = `
             <p>布基纳法索 · 沙特</p>
             </div>
             <div class="work-footer">
-              <a class="text-link award-link" href="https://www.seetao.com/details/253446.html" target="_blank" rel="noreferrer">单项目中标 <strong class="red">1 亿美元</strong><span class="sr-only">（查看报道，新窗口打开）</span></a>
+              <a class="text-link award-link" href="https://www.seetao.com/details/253446.html" target="_blank" rel="noreferrer">团队单项目中标 <strong class="red">1 亿美元</strong><span class="sr-only">（查看报道，新窗口打开）</span></a>
               <span class="work-bottom">BUSINESS DEVELOPMENT</span>
             </div>
           </div>

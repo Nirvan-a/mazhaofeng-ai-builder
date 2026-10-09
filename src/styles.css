@@ -252,6 +252,7 @@ h1 > span { display: block; width: fit-content; }
   .work-index i { width: 6px; }
   .work-card { padding-inline: 10px; }
   .work-card h3 { font-size: 18px; }
+  .award-link { font-size: 10px; }
   .stage-meta, .stage-copy { left: 16px; }
 }
 @media (max-height: 700px) and (min-width: 701px) {
