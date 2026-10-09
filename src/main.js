@@ -41,7 +41,7 @@ document.querySelector('#app').innerHTML = `
 
   <main>
     <section id="home" class="hero section-shell" aria-labelledby="hero-title">
-      <div class="hero-bg" role="img" aria-label="黑白山谷与湖面"></div>
+      <img class="hero-bg" src="${ASSET_ROOT}/1878578069089322.png" alt="" fetchpriority="high" />
       <div class="hero-copy reveal">
         <p class="eyebrow">AI BUILDER / SHANGHAI</p>
         <h1 id="hero-title">把复杂 AI，<br />做成可交付的<br />业务系统</h1>
