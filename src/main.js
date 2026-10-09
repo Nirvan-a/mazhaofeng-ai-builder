@@ -21,7 +21,7 @@ const steps = [
 ];
 
 const clientGroup = (items, duplicate = false) => `
-  <div class="client-group" ${duplicate ? 'aria-hidden="true" inert' : ''}>
+  <div class="client-group" ${duplicate ? 'aria-hidden="true" inert' : 'data-client-original'}>
     ${items.map(({ name, logo, brand, width, height }) => `
       <span class="client-item">
         ${logo ? `
@@ -85,8 +85,8 @@ document.querySelector('#app').innerHTML = `
             </li>`).join('')}
         </ol>
         <svg class="journey-route" viewBox="0 0 1440 430" preserveAspectRatio="none" aria-hidden="true">
-          <path pathLength="1" d="M-10 215 C160 175 245 190 390 222 S620 275 763 235 S1000 190 1123 230 S1320 235 1430 202" />
-          <path class="route-arrow" d="m1414 195 17 7-12 13" />
+          <path pathLength="1" d="M56 215 C160 175 245 190 390 222 S620 275 763 235 S1000 190 1123 230 S1280 235 1384 202" />
+          <path class="route-arrow" d="m1370 198 14 4-8 11" />
         </svg>
       </div>
       <div class="journey-ending section-inset"><span class="eyebrow">ALWAYS A BEGINNER.</span><p>由兴趣出发，寻直觉前行.</p></div>
@@ -156,8 +156,8 @@ document.querySelector('#app').innerHTML = `
         <h2 id="clients-title">SELECTED CLIENTS <span>/</span> 服务企业</h2>
         <i aria-hidden="true"></i>
       </div>
-        <div class="client-marquee" aria-label="服务企业，自动循环展示">
-          <div class="client-track">${clientGroup(clients)}${clientGroup(clients, true)}</div>
+        <div class="client-marquee" tabindex="0" aria-label="服务企业，可左右拖动浏览，松开后继续自动循环">
+          <div class="client-track">${clientGroup(clients)}</div>
         </div>
       </aside>
     </section>
@@ -169,10 +169,15 @@ document.querySelector('#app').innerHTML = `
 
 // Decode the photograph before revealing its entire art layer, including red.
 // A failed or slow image leaves a neutral, fully usable introduction.
+const hero = document.querySelector('#home');
+const heroArt = document.querySelector('.hero-art');
 const heroImage = document.querySelector('.hero-landscape img');
 heroImage.decode().then(() => {
-  document.querySelector('.hero-art').classList.add('is-ready');
-}).catch(() => {});
+  heroArt.classList.add('is-ready');
+}).catch(() => {
+  hero.classList.add('is-copy-ready');
+});
+setTimeout(() => hero.classList.add('is-copy-ready'), 3500);
 
 const sectionImageObserver = new IntersectionObserver((entries) => {
   for (const entry of entries) {
@@ -200,6 +205,7 @@ const revealObserver = new IntersectionObserver((entries) => {
   for (const entry of entries) {
     if (!entry.isIntersecting) continue;
     entry.target.classList.add('is-visible');
+    if (entry.target.classList.contains('journey-film')) entry.target.classList.add('route-visible');
     revealObserver.unobserve(entry.target);
   }
 }, { threshold: 0.1 });
@@ -216,20 +222,32 @@ function sizeJourneyRoute() {
   });
   route.setAttribute('viewBox', `0 0 ${bounds.width} ${bounds.height}`);
   const rise = Math.min(38, bounds.height * .1);
-  let path = `M-10 ${points[0].y + 12} Q0 ${points[0].y} ${points[0].x} ${points[0].y}`;
+  const edge = Math.min(56, Math.max(28, bounds.width * .04));
+  let path = `M${edge} ${points[0].y + 12} Q${edge + 12} ${points[0].y} ${points[0].x} ${points[0].y}`;
   points.slice(1).forEach((point, index) => {
     const previous = points[index];
     const third = (point.x - previous.x) / 3;
     const bend = index % 2 ? rise : -rise;
     path += ` C${previous.x + third} ${previous.y + bend} ${point.x - third} ${point.y + bend} ${point.x} ${point.y}`;
   });
-  const last = points.at(-1), endX = bounds.width - 12, endY = last.y - rise;
+  const last = points.at(-1), endX = bounds.width - edge, endY = last.y - rise;
   path += ` Q${last.x + (endX - last.x) / 2} ${last.y} ${endX} ${endY}`;
   route.firstElementChild.setAttribute('d', path);
   route.lastElementChild.setAttribute('d', `m${endX - 14} ${endY - 4} 14 4-8 11`);
 }
 new ResizeObserver(sizeJourneyRoute).observe(film);
 document.fonts.ready.then(sizeJourneyRoute);
+
+function replayJourneyRoute() {
+  if (motionPreference.matches) return;
+  film.classList.add('route-resetting');
+  film.classList.remove('route-visible');
+  void film.offsetWidth;
+  requestAnimationFrame(() => {
+    film.classList.remove('route-resetting');
+    requestAnimationFrame(() => film.classList.add('route-visible'));
+  });
+}
 
 const header = document.querySelector('.site-header');
 const sections = [...document.querySelectorAll('main > section[id]')];
@@ -259,6 +277,7 @@ function releaseThresholdSnap() {
   snapping = false;
   directionSampleY = scrollY;
   clearTimeout(snapReleaseTimer);
+  if (Math.abs(scrollY - document.querySelector('#journey').offsetTop) <= 2) replayJourneyRoute();
 }
 
 function snapAtThreshold() {
@@ -285,7 +304,10 @@ function snapAtThreshold() {
       target = nextExposure > .3 ? next : current;
     }
   }
-  if (Math.abs(scrollY - target.offsetTop) <= 2) return;
+  if (Math.abs(scrollY - target.offsetTop) <= 2) {
+    if (target.id === 'journey') replayJourneyRoute();
+    return;
+  }
   snapping = true;
   snapTargetY = target.offsetTop;
   scrollTo({ top: snapTargetY, behavior: motionPreference.matches ? 'instant' : 'smooth' });
@@ -347,33 +369,185 @@ addEventListener('keydown', (event) => {
   scrollDirection = event.key === ' ' && event.shiftKey ? -1 : directions[event.key];
   interruptThresholdSnap();
 });
+
+const swipeExclusion = '.client-marquee, .life-reel, .life-lightbox, a, button, input, textarea, select, [contenteditable="true"]';
+let pageSwipe = null;
+document.querySelector('main').addEventListener('touchstart', (event) => {
+  if (event.touches.length !== 1 || event.target.closest(swipeExclusion)) return;
+  const touch = event.touches[0];
+  pageSwipe = { id: touch.identifier, x: touch.clientX, y: touch.clientY };
+}, { passive: true });
+addEventListener('touchend', (event) => {
+  const touch = [...event.changedTouches].find((candidate) => candidate.identifier === pageSwipe?.id);
+  if (!pageSwipe || !touch) return;
+  const deltaX = touch.clientX - pageSwipe.x;
+  const deltaY = touch.clientY - pageSwipe.y;
+  pageSwipe = null;
+  if (Math.abs(deltaX) < Math.max(56, innerWidth * .08) || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
+  const currentIndex = sections.reduce((closest, section, index) =>
+    Math.abs(section.offsetTop - scrollY) < Math.abs(sections[closest].offsetTop - scrollY) ? index : closest, 0);
+  const targetIndex = Math.max(0, Math.min(sections.length - 1, currentIndex + (deltaX < 0 ? 1 : -1)));
+  if (targetIndex === currentIndex) return;
+  clearTimeout(snapTimer);
+  clearTimeout(snapReleaseTimer);
+  scrollDirection = deltaX < 0 ? 1 : -1;
+  snapping = true;
+  snapTargetY = sections[targetIndex].offsetTop;
+  scrollTo({ top: snapTargetY, behavior: motionPreference.matches ? 'instant' : 'smooth' });
+  snapReleaseTimer = setTimeout(releaseThresholdSnap, 1000);
+}, { passive: true });
+addEventListener('touchcancel', () => { pageSwipe = null; }, { passive: true });
 addEventListener('resize', updateNavigation);
 updateNavigation();
 
 const clientSection = document.querySelector('.clients');
 const clientRows = [...document.querySelectorAll('.client-marquee')];
-new IntersectionObserver(([entry]) => {
-  clientSection.classList.toggle('is-offscreen', !entry.isIntersecting);
-}).observe(clientSection);
+const wrapClientPosition = (value, length) => ((value % length) + length) % length;
 
-function sizeClientLoops() {
-  clientRows.forEach((row) => {
-    const track = row.querySelector('.client-track');
-    const group = track.firstElementChild;
-    const width = group.getBoundingClientRect().width;
-    if (!width) return;
-    // One full period plus the viewport must remain covered at every frame.
-    const count = Math.max(2, Math.ceil(row.clientWidth / width) + 1);
-    while (track.children.length < count) {
-      const copy = group.cloneNode(true);
-      copy.setAttribute('aria-hidden', 'true');
-      copy.setAttribute('inert', '');
-      track.append(copy);
+function initClientMarquee(row) {
+  const track = row.querySelector('.client-track');
+  const original = row.querySelector('[data-client-original]');
+  const before = [];
+  const after = [];
+  const pauses = new Set(['layout', 'offscreen']);
+  let span = 0;
+  let base = 0;
+  let frame = 0;
+  let lastTime = 0;
+  let autoPosition = 0;
+  let manualTimer = 0;
+  let pointer = null;
+
+  const cloneGroup = () => {
+    const clone = original.cloneNode(true);
+    clone.removeAttribute('data-client-original');
+    clone.setAttribute('aria-hidden', 'true');
+    clone.setAttribute('inert', '');
+    return clone;
+  };
+
+  function animate(time) {
+    frame = 0;
+    if (pauses.size) return;
+    if (lastTime) {
+      autoPosition = base + wrapClientPosition(autoPosition - base + Math.min(time - lastTime, 64) * .031, span);
+      row.scrollLeft = autoPosition;
+    } else {
+      autoPosition = row.scrollLeft;
     }
-    track.style.setProperty('--client-shift', `${-width}px`);
-    track.style.animationDuration = `${width / 31}s`;
+    lastTime = time;
+    frame = requestAnimationFrame(animate);
+  }
+
+  function syncPlayback() {
+    if (pauses.size) {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      lastTime = 0;
+    } else if (!frame) {
+      frame = requestAnimationFrame(animate);
+    }
+  }
+
+  function pause(reason, enabled) {
+    if (enabled) pauses.add(reason);
+    else pauses.delete(reason);
+    syncPlayback();
+  }
+
+  function holdManual(delay = 500) {
+    pause('manual', true);
+    clearTimeout(manualTimer);
+    manualTimer = setTimeout(() => {
+      autoPosition = row.scrollLeft;
+      pause('manual', false);
+    }, delay);
+  }
+
+  function wrapManualScroll() {
+    if (!span) return;
+    const left = row.scrollLeft;
+    if (left < base || left >= base + span) {
+      autoPosition = base + wrapClientPosition(left - base, span);
+      row.scrollLeft = autoPosition;
+    }
+  }
+
+  function measure() {
+    const relative = span ? row.scrollLeft - base : 0;
+    span = original.getBoundingClientRect().width;
+    if (!span) return;
+    const sideCount = Math.max(1, Math.ceil(row.clientWidth / span));
+    while (before.length < sideCount) {
+      const clone = cloneGroup();
+      track.prepend(clone);
+      before.push(clone);
+    }
+    while (after.length < sideCount) {
+      const clone = cloneGroup();
+      track.append(clone);
+      after.push(clone);
+    }
+    base = original.offsetLeft;
+    autoPosition = base + wrapClientPosition(relative, span);
+    row.scrollLeft = autoPosition;
+    pauses.delete('layout');
+    pause('static', motionPreference.matches);
+    lastTime = 0;
+  }
+
+  function finishPointer(event = {}) {
+    const activePointer = pointer;
+    if (!activePointer || (event.pointerId != null && event.pointerId !== activePointer.id)) return;
+    pointer = null;
+    if (row.hasPointerCapture(activePointer.id)) row.releasePointerCapture(activePointer.id);
+    row.classList.remove('is-dragging');
+    holdManual(400);
+    pause('pointer', false);
+  }
+
+  row.addEventListener('wheel', (event) => {
+    if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) holdManual();
+  }, { passive: true });
+  row.addEventListener('scroll', () => {
+    wrapManualScroll();
+    if (pauses.has('manual')) holdManual();
+  }, { passive: true });
+  row.addEventListener('keydown', (event) => {
+    if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+    event.preventDefault();
+    holdManual(400);
+    row.scrollLeft += (event.key === 'ArrowRight' ? 1 : -1) * Math.min(260, row.clientWidth * .45);
   });
+  row.addEventListener('pointerdown', (event) => {
+    if (!event.isPrimary || event.button !== 0) return;
+    pointer = { id: event.pointerId, type: event.pointerType, x: event.clientX, lastX: event.clientX, moved: false };
+    if (event.pointerType === 'mouse') row.setPointerCapture(event.pointerId);
+    pause('pointer', true);
+  });
+  addEventListener('pointermove', (event) => {
+    if (!pointer || event.pointerId !== pointer.id || pointer.type !== 'mouse') return;
+    if (Math.abs(event.clientX - pointer.x) > 5) pointer.moved = true;
+    if (!pointer.moved) return;
+    event.preventDefault();
+    row.scrollLeft -= event.clientX - pointer.lastX;
+    pointer.lastX = event.clientX;
+    row.classList.add('is-dragging');
+  }, { passive: false });
+  addEventListener('pointerup', finishPointer);
+  addEventListener('pointercancel', finishPointer);
+  addEventListener('blur', () => finishPointer());
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) finishPointer();
+    pause('hidden', document.hidden);
+  });
+  new IntersectionObserver(([entry]) => pause('offscreen', !entry.isIntersecting)).observe(clientSection);
+  const resizeObserver = new ResizeObserver(measure);
+  resizeObserver.observe(row);
+  resizeObserver.observe(original);
+  motionPreference.addEventListener('change', measure);
+  document.fonts.ready.then(measure);
+  measure();
 }
-new ResizeObserver(sizeClientLoops).observe(clientSection);
-document.fonts.ready.then(sizeClientLoops);
-sizeClientLoops();
+
+clientRows.forEach(initClientMarquee);
