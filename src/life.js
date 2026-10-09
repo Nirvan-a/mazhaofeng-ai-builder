@@ -15,7 +15,6 @@ const normalizePhotos = (photos) => (Array.isArray(photos) ? photos : [])
   }));
 const number = (value) => String(value).padStart(2, '0');
 const modulo = (value, length) => ((value % length) + length) % length;
-const arrow = (direction) => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="${direction < 0 ? 'M14 5 7 12l7 7M7 12h13' : 'm10 5 7 7-7 7M17 12H4'}" stroke="currentColor" stroke-width="1.5"/></svg>`;
 
 export function renderLife(photos) {
   const items = normalizePhotos(photos);
@@ -49,7 +48,6 @@ export function renderLife(photos) {
       ` : '<p class="life-empty">暂时没有可展示的生活照片。</p>'}
       <footer class="life-ending" aria-label="结束语">
         <p class="life-outro">KEEP EXPLORING<span>.</span></p>
-        <a class="life-github" href="https://github.com/Nirvan-a" target="_blank" rel="noreferrer" aria-label="GitHub（新窗口打开）">GitHub</a>
         <div class="life-colophon">
           <p class="life-signature">马兆峰 <span>/ AI BUILDER</span></p>
           <span class="life-location">Shanghai</span>
@@ -57,25 +55,12 @@ export function renderLife(photos) {
         </div>
       </footer>
       ${items.length ? `
-        <dialog class="life-lightbox" aria-labelledby="life-lightbox-title" aria-describedby="life-lightbox-caption">
+        <dialog class="life-lightbox" aria-label="图片预览">
           <div class="life-lightbox-shell">
-            <div class="life-lightbox-top">
-              <h3 id="life-lightbox-title">生活剪影 <span aria-hidden="true">/</span> <span data-life-counter></span></h3>
-              <button class="life-lightbox-button life-lightbox-close" type="button" data-life-close autofocus aria-label="关闭大图">
-                <span>关闭</span><svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6" stroke="currentColor" stroke-width="1.5"/></svg>
-              </button>
-            </div>
-            <figure class="life-lightbox-figure">
-              <img class="life-lightbox-image" data-life-full alt="" decoding="async" />
-              <figcaption id="life-lightbox-caption" class="life-lightbox-caption" aria-live="polite" aria-atomic="true">
-                <strong data-life-title></strong><span data-life-meta></span>
-              </figcaption>
-            </figure>
-            <div class="life-lightbox-bottom">
-              <button class="life-lightbox-button" type="button" data-life-previous aria-label="上一张照片">${arrow(-1)}</button>
-              <p>OFF THE CLOCK</p>
-              <button class="life-lightbox-button" type="button" data-life-next aria-label="下一张照片">${arrow(1)}</button>
-            </div>
+            <button class="life-lightbox-close" type="button" data-life-close autofocus aria-label="关闭大图">
+              <span aria-hidden="true">×</span>
+            </button>
+            <img class="life-lightbox-image" data-life-full alt="" decoding="async" />
           </div>
         </dialog>` : ''}
     </section>`;
@@ -125,7 +110,7 @@ export function initLife(photos) {
     }
     if (pauses.size) return;
     if (lastTime) {
-      autoPosition = span + modulo(autoPosition - span + Math.min(time - lastTime, 64) * .035, span);
+      autoPosition = span + modulo(autoPosition - span + Math.min(time - lastTime, 64) * .045, span);
       reel.scrollLeft = autoPosition;
     } else {
       autoPosition = reel.scrollLeft;
@@ -249,9 +234,6 @@ export function initLife(photos) {
       };
       highResolution.src = intended;
     }
-    dialog.querySelector('[data-life-title]').textContent = photo.alt;
-    dialog.querySelector('[data-life-meta]').textContent = photo.meta;
-    dialog.querySelector('[data-life-counter]').textContent = `${number(current + 1)} / ${number(items.length)}`;
   }
 
   function openPhoto(index) {
@@ -354,15 +336,6 @@ export function initLife(photos) {
     if (button) openPhoto(Number(button.dataset.lifePhoto));
   });
   listen(dialog.querySelector('[data-life-close]'), 'click', () => dialog.close());
-  listen(dialog.querySelector('[data-life-previous]'), 'click', () => showPhoto(current - 1));
-  listen(dialog.querySelector('[data-life-next]'), 'click', () => showPhoto(current + 1));
-  listen(dialog, 'keydown', (event) => {
-    if (event.altKey || event.ctrlKey || event.metaKey) return;
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-      event.preventDefault();
-      showPhoto(current + (event.key === 'ArrowLeft' ? -1 : 1));
-    }
-  });
   listen(dialog, 'click', (event) => {
     if (event.target !== dialog) return;
     const rect = dialog.getBoundingClientRect();

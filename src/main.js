@@ -16,8 +16,8 @@ const clients = [
 const steps = [
   { title: '学习', date: '2020 — 2024', organization: '华中科技大学', role: '国际商务 &amp; 英语双学位', text: '从商科出发', image: scenes.library, note: 'LEARN' },
   { title: '创造', date: '2022 — 2023', organization: '阿里巴巴 &amp; Cider', role: 'iOS 工程师', text: '用代码表达想法', image: scenes.coding, note: 'BUILD' },
-  { title: '远行', date: '2024 — 2025', organization: '特变电工', role: '市场经理', text: '在驻外现场理解业务', image: scenes.travel, note: 'EXPLORE' },
-  { title: '实践', date: '2026 — 至今', organization: '字节跳动', text: '让 AI 真正进入工作', image: scenes.collaboration, note: 'PRACTICE' },
+  { title: '商业', date: '2024 — 2025', organization: '特变电工', role: '市场经理', text: '在驻外现场理解业务', image: scenes.travel, note: 'EXPLORE' },
+  { title: '实践', date: '2025 — 至今', organization: '云问 &amp; 字节跳动', text: '让 AI 真正进入工作', image: scenes.collaboration, note: 'DELIVER' },
 ];
 
 const clientGroup = (items, duplicate = false) => `
@@ -48,7 +48,6 @@ document.querySelector('#app').innerHTML = `
         <div class="hero-landscape">
           <img src="${scenes.hero}" alt="" width="1586" height="992" fetchpriority="high" decoding="async" />
         </div>
-        <div class="hero-red"></div>
       </div>
       <div class="hero-copy">
         <span class="hero-rule" aria-hidden="true"></span>
@@ -87,7 +86,7 @@ document.querySelector('#app').innerHTML = `
           <path class="route-arrow" d="m1414 195 17 7-12 13" />
         </svg>
       </div>
-      <div class="journey-ending section-inset"><span class="eyebrow">ALWAYS A BEGINNER.</span><p>兴趣让我开始，好奇让我远行。</p></div>
+      <div class="journey-ending section-inset"><span class="eyebrow">ALWAYS A BEGINNER.</span><p>由兴趣出发，寻直觉前行.</p></div>
     </section>
 
     <section id="work" class="page work section-inset" aria-labelledby="work-title">

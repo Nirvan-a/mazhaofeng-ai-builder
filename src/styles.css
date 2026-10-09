@@ -51,7 +51,6 @@ main > .page:not(#home) { content-visibility: auto; contain-intrinsic-size: 100d
 .hero-landscape { position: absolute; inset: 0; }
 .hero-landscape img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: grayscale(1) contrast(.9); }
 .hero-landscape::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(248 247 244 / 97%), rgb(248 247 244 / 65%) 36%, rgb(248 247 244 / 5%) 74%), linear-gradient(180deg, rgb(248 247 244 / 75%), transparent 30%); }
-.hero-red { position: absolute; inset: 0 0 0 auto; width: 13%; background: linear-gradient(90deg, transparent, rgb(220 0 6 / 75%)); mix-blend-mode: multiply; }
 .hero-copy { align-self: center; padding-bottom: 5dvh; min-width: 0; }
 .hero-rule { display: block; width: 1px; height: clamp(24px, 4dvh, 48px); margin-bottom: 22px; background: #aaa79f; }
 h1 { font-size: clamp(40px, min(7vw, 14dvh), 128px); line-height: 1.25; letter-spacing: -.065em; font-weight: 900; }
@@ -188,7 +187,6 @@ h1 > span { display: block; width: fit-content; }
   .hero-description { font-size: 11px; letter-spacing: .04em; margin-top: 22px; }
   .hero-landscape img { object-position: 65% center; }
   .hero-landscape::after { background: linear-gradient(180deg, rgb(248 247 244 / 98%), rgb(248 247 244 / 73%) 40%, rgb(248 247 244 / 5%) 78%), linear-gradient(90deg, rgb(248 247 244 / 55%), transparent); }
-  .hero-red { width: 14%; opacity: .65; }
   .hero-art.is-ready ~ .hero-bottom { color: var(--paper); text-shadow: 0 1px 4px rgb(0 0 0 / 65%); }
   .hero-art.is-ready ~ .hero-bottom .chapter-label i { background: rgb(248 247 244 / 65%); }
   .hero-bottom { column-gap: 12px; row-gap: 26px; grid-template-columns: 1fr; }
