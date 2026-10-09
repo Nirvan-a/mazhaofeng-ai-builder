@@ -51,6 +51,7 @@ export function renderLife(photos) {
       ` : '<p class="life-empty">暂时没有可展示的生活照片。</p>'}
       <footer class="life-ending" aria-label="结束语">
         <p class="life-outro">KEEP EXPLORING<span>.</span></p>
+        <p class="life-note">STAY CURIOUS.</p>
         <div class="life-colophon">
           <p class="life-signature">马兆峰 <span>/ AI BUILDER</span></p>
           <span class="life-location">Shanghai</span>
@@ -58,11 +59,8 @@ export function renderLife(photos) {
         </div>
       </footer>
       ${items.length ? `
-        <dialog class="life-lightbox" aria-label="图片预览">
+        <dialog class="life-lightbox" aria-label="图片预览，点击图片或背景关闭">
           <div class="life-lightbox-shell">
-            <button class="life-lightbox-close" type="button" data-life-close aria-label="关闭大图">
-              <span aria-hidden="true">×</span>
-            </button>
             <img class="life-lightbox-preview" data-life-preview alt="" decoding="async" />
             <img class="life-lightbox-image" data-life-full alt="" decoding="async" fetchpriority="high" />
           </div>
@@ -141,10 +139,13 @@ export function initLife(photos) {
     syncPlayback();
   }
 
-  function holdManual() {
+  function holdManual(delay = 500) {
     pause('manual', true);
     window.clearTimeout(manualTimer);
-    manualTimer = window.setTimeout(() => pause('manual', false), 1600);
+    manualTimer = window.setTimeout(() => {
+      autoPosition = reel.scrollLeft;
+      pause('manual', false);
+    }, delay);
   }
 
   function wrapScroll() {
@@ -275,26 +276,27 @@ export function initLife(photos) {
     pause('dialog', false);
   }
 
-  function finishPointer(event) {
-    if (!pointer || event.pointerId !== pointer.id) return;
-    if (pointer.moved || event.type === 'pointercancel') suppressClickUntil = performance.now() + 500;
-    if (reel.hasPointerCapture(pointer.id)) reel.releasePointerCapture(pointer.id);
+  function finishPointer(event = {}) {
+    const activePointer = pointer;
+    if (!activePointer || (event.pointerId != null && event.pointerId !== activePointer.id)) return;
     pointer = null;
+    if (activePointer.moved || event.type === 'pointercancel') suppressClickUntil = performance.now() + 500;
+    if (reel.hasPointerCapture(activePointer.id)) reel.releasePointerCapture(activePointer.id);
     root.classList.remove('life-is-dragging');
-    holdManual();
+    holdManual(400);
     pause('pointer', false);
   }
 
-  listen(reel, 'wheel', holdManual, { passive: true });
+  listen(reel, 'wheel', () => holdManual(500), { passive: true });
   listen(reel, 'scroll', () => {
     wrapScroll();
-    if (pauses.has('manual')) holdManual();
+    if (pauses.has('manual')) holdManual(500);
   }, { passive: true });
   listen(reel, 'keydown', (event) => {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
-      holdManual();
+      holdManual(400);
       reel.scrollLeft += (event.key === 'ArrowLeft' ? -1 : 1) * reel.clientWidth * .6;
     }
   });
@@ -302,6 +304,7 @@ export function initLife(photos) {
   listen(reel, 'pointerdown', (event) => {
     if (!event.isPrimary || event.button !== 0) return;
     pointer = { id: event.pointerId, type: event.pointerType, x: event.clientX, y: event.clientY, lastX: event.clientX, moved: false };
+    reel.setPointerCapture(event.pointerId);
     pause('pointer', true);
   });
   listen(window, 'pointermove', (event) => {
@@ -319,6 +322,7 @@ export function initLife(photos) {
   }, { passive: false });
   listen(window, 'pointerup', finishPointer);
   listen(window, 'pointercancel', finishPointer);
+  listen(window, 'blur', () => finishPointer());
   listen(reel, 'lostpointercapture', finishPointer);
   listen(reel, 'click', (event) => {
     if (event.detail > 0 && performance.now() < suppressClickUntil) {
@@ -336,14 +340,12 @@ export function initLife(photos) {
     }
     if (button) openPhoto(Number(button.dataset.lifePhoto));
   });
-  listen(dialog.querySelector('[data-life-close]'), 'click', () => dialog.close());
-  listen(dialog, 'click', (event) => {
-    if (event.target !== dialog) return;
-    const rect = dialog.getBoundingClientRect();
-    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
-  });
+  listen(dialog, 'click', () => dialog.close());
   listen(dialog, 'close', finishDialog);
-  listen(document, 'visibilitychange', () => pause('hidden', document.hidden));
+  listen(document, 'visibilitychange', () => {
+    if (document.hidden) finishPointer();
+    pause('hidden', document.hidden);
+  });
   listen(motion, 'change', measure);
   listen(original, 'load', (event) => preserveRatio(event.target), { capture: true });
   original.querySelectorAll('img').forEach(preserveRatio);
