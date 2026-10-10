@@ -1,53 +1,54 @@
 # 马兆峰个人网站
 
-Vite + 原生 JavaScript / CSS。妙搭应用 `app_17fqurz8tq0`，开发分支 `sprint/default`。
+独立的个人作品集前端，使用 Vite、原生 JavaScript 和 CSS 构建。
 
-在线访问：https://bytedance.feishuapp.cn/app/app_17fqurz8tq0
+在线访问：https://nirvan-a.github.io/mazhaofeng-ai-builder/
 
-## 页面结构
+## 功能
 
-- `src/main.js` / `src/styles.css`：首页、带年份的职业旅程、四项成果、单行企业自动滚动与 01—04 导航。
-- `src/life.js` / `src/life.css`：自动生活照片带、拖动、键盘可操作的大图浏览及一体化结束页。
-- `src/photos.js`：本应用文件存储中的照片地址。替换照片与文案可在此修改。
-
-所有标题、段落、链接和企业名称均为可见 HTML；旅程红线为 SVG。图片只承载摄影内容。请勿重新引入整屏设计稿、隐藏正文或透明点击热区。
-
-四个章节均为 `100dvh`，导航落在章节顶部；固定页头高度由 `--header-h` 统一控制。首屏照片和红色叠层在 `img.decode()` 成功后一起淡入，加载前保留中性背景与完整正文。企业及照片浏览区无播放工具栏，系统减少动态效果时保持静止。
-
-照片来自用户确认的设计稿中的纯摄影区域、既有无字山景，以及用户提供的四张生活照片。原图保留不动；网页使用压缩后的 WebP。生活照片按实际画面描述，不推测拍摄时间与地点。
+- 四屏全页作品集：简介、职业旅程、项目成果与生活照片。
+- 触摸与触控板横向手势分页，滚动位置与 URL hash 同步。
+- 客户 Logo 和生活照片无限循环滚动，支持拖动与键盘浏览。
+- 响应式布局、减少动态效果适配和图片渐进加载。
+- 生活照片大图预览与微信号复制。
 
 ## 本地开发
 
-环境要求：Node.js `^20.19.0` 或 `>=22.12.0`，推荐使用 Node.js 22。
+环境要求：Node.js `^20.19.0` 或 `>=22.12.0`，推荐 Node.js 22。
 
 ```bash
 npm ci
 npm run dev
 ```
 
-生产构建：
+开发服务器默认运行在 `http://localhost:5173`。
+
+## 构建
 
 ```bash
 npm run build
+npm run preview
 ```
 
-照片和 Logo 存放在妙搭应用文件存储中，源码引用 `/app/app_17fqurz8tq0/runtime/...` 路径。脱离妙搭运行或部署到 GitHub Pages 前，需要先迁移这些资源并更新 `src/photos.js` 与 `index.html` 中的路径。
+标准静态站点产物生成在 `dist/`，可部署到 GitHub Pages、Cloudflare Pages、Vercel、Netlify 或任意静态文件服务器。
 
-## 妙搭发布
+部署到子路径时可指定：
 
-`npm run dev` 启动 Vite，`npm run build` 生成妙搭部署格式：
+```bash
+VITE_BASE_PATH=/your-repository/ npm run build
+```
 
-- `dist/output/index.html`
-- `dist/output_resource/assets/*`
+## GitHub Pages
 
-图片路径属于妙搭运行时，本地验证时需单独映射应用存储，不能把本地图片路径写入产品源码。默认 Vite preview 不适用于上述分离的部署目录。
+推送到 `main` 后，[Deploy GitHub Pages](.github/workflows/build.yml) 会自动安装依赖、构建并发布 `dist/`。
 
-发布顺序：构建 → 提交相关文件 → 推送 `sprint/default` → `lark-cli apps +release-create` → 对同一发布单执行 `+release-get`，确认 `finished`。所有飞书命令显式使用本机 `--profile CLI1`，支持时加 `--as user`；第一次访问先核验身份。
+## 目录
 
-## 验证要点
-
-检查 1440×900、1440×768、1366×650、1920×1080、390×844、375×667、320×568、844×390：整页恰好四屏、各屏文字不裁切、章节落点与高亮对应、企业单行自动滚动、图片阻断和延迟加载时不闪红。照片拖动、大图前后切换与 Esc 关闭、循环副本关闭后的横向位置、焦点与页面滚动恢复另做交互验证。隐藏所有图片后，正文与成果信息仍应完整可读。
+- `src/main.js` / `src/styles.css`：首页、职业旅程、项目成果与全局导航。
+- `src/life.js` / `src/life.css`：生活照片、循环滚动、预览与结束页。
+- `src/photos.js`：本地图片资源映射。
+- `public/assets/`：场景照片、生活照片与客户 Logo。
 
 ## 内容声明
 
-仓库中的个人照片、个人履历、客户信息与联系方式仅用于本网站展示，不授权复制、分发或再利用。
+仓库中的个人照片、个人履历、客户信息、Logo 与联系方式仅用于本网站展示，不授权复制、分发或再利用。

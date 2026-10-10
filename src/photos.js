@@ -1,33 +1,31 @@
-// Runtime storage belongs to this application. Images contain photography only;
-// all titles, captions, navigation, numbers and paths are rendered as DOM/SVG.
-const storage = '/app/app_17fqurz8tq0/runtime/api/v1/storage/object/bucket_aadkzdtnjwiby';
+const asset = (path) => `${import.meta.env.BASE_URL}assets/${path}`;
 
 export const scenes = {
-  hero: `${storage}/1878591577042073.webp`,
-  library: `${storage}/1878582004672643.webp`,
-  coding: `${storage}/1878582012815411.webp`,
-  travel: `${storage}/1878591568203881.webp`,
-  collaboration: `${storage}/1878582016497668.webp`,
-  architecture: `${storage}/1878582012815395.webp`,
+  hero: asset('scenes/hero.webp'),
+  library: asset('scenes/library.webp'),
+  coding: asset('scenes/coding.webp'),
+  travel: asset('scenes/travel.webp'),
+  collaboration: asset('scenes/collaboration.webp'),
+  architecture: asset('scenes/architecture.webp'),
 };
 
 export const clientLogos = {
-  sonabel: `${storage}/1878596284398682.png`,
-  saudiEnergy: `${storage}/1878597636351035.png`,
-  chinaCopper: `${storage}/1878596357503088.png`,
-  fotile: `${storage}/1878596308437018.png`,
-  luckin: `${storage}/1878596167902297.png`,
-  saic: `${storage}/1878596308437034.png`,
-  envision: `${storage}/1878596352360681.png`,
+  sonabel: asset('logos/sonabel.png'),
+  saudiEnergy: asset('logos/saudi-electricity.png'),
+  chinaCopper: asset('logos/china-copper.png'),
+  fotile: asset('logos/fotile.png'),
+  luckin: asset('logos/luckin.png'),
+  saic: asset('logos/saic.png'),
+  envision: asset('logos/envision.png'),
 };
 
 export const lifePhotos = [
-  { src: `${storage}/1878591963399355.webp`, fullSrc: `${storage}/1878590728992793.webp`, alt: '山水之间', meta: 'BY THE WATER', aspectRatio: 3 / 2 },
-  { src: `${storage}/1878591961876571.webp`, fullSrc: `${storage}/1878590903932969.webp`, alt: '西非街头', meta: 'ON THE ROAD', aspectRatio: 4 / 3 },
-  { src: `${storage}/1878591969445961.webp`, fullSrc: `${storage}/1878590887846075.webp`, alt: '城市俯瞰', meta: 'RIYADH', aspectRatio: 4 / 3 },
-  { src: `${storage}/1878591973016649.webp`, fullSrc: `${storage}/1878590728992809.webp`, alt: '射击体验', meta: 'OFF DUTY', aspectRatio: 2400 / 1351 },
-  { src: `${storage}/1878591971829978.webp`, fullSrc: `${storage}/1878590728993865.webp`, alt: '豆包即猫', meta: 'DOUBAO & CAT', aspectRatio: 2400 / 1553 },
-  { src: `${storage}/1878591961876555.webp`, fullSrc: `${storage}/1878590887846059.webp`, alt: '围坐的一餐', meta: 'AT THE TABLE', aspectRatio: 4 / 3 },
-  { src: `${storage}/1878591963400331.webp`, fullSrc: `${storage}/1878590728992777.webp`, alt: '夜樱与街巷', meta: 'AFTER DARK', aspectRatio: 4 / 3 },
-  { src: `${storage}/1878591963400347.webp`, fullSrc: `${storage}/1878590903932985.webp`, alt: '沙丁风暴', meta: 'UNDER THE SURFACE', aspectRatio: 4 / 3 },
+  { src: asset('life/thumb-03.webp'), fullSrc: asset('life/full-03.webp'), alt: '山水之间', meta: 'BY THE WATER', aspectRatio: 3 / 2 },
+  { src: asset('life/thumb-01.webp'), fullSrc: asset('life/full-01.webp'), alt: '西非街头', meta: 'ON THE ROAD', aspectRatio: 4 / 3 },
+  { src: asset('life/thumb-02.webp'), fullSrc: asset('life/full-02.webp'), alt: '城市俯瞰', meta: 'RIYADH', aspectRatio: 4 / 3 },
+  { src: asset('life/thumb-06.webp'), fullSrc: asset('life/full-06.webp'), alt: '射击体验', meta: 'OFF DUTY', aspectRatio: 2400 / 1351 },
+  { src: asset('life/thumb-08.webp'), fullSrc: asset('life/full-08.webp'), alt: '豆包即猫', meta: 'DOUBAO & CAT', aspectRatio: 2400 / 1553 },
+  { src: asset('life/thumb-04.webp'), fullSrc: asset('life/full-04.webp'), alt: '围坐的一餐', meta: 'AT THE TABLE', aspectRatio: 4 / 3 },
+  { src: asset('life/thumb-05.webp'), fullSrc: asset('life/full-05.webp'), alt: '夜樱与街巷', meta: 'AFTER DARK', aspectRatio: 4 / 3 },
+  { src: asset('life/thumb-07.webp'), fullSrc: asset('life/full-07.webp'), alt: '沙丁风暴', meta: 'UNDER THE SURFACE', aspectRatio: 4 / 3 },
 ];

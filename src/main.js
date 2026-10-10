@@ -154,7 +154,7 @@ document.querySelector('#app').innerHTML = `
             <span class="work-index">04 <i aria-hidden="true"></i> INTO THE REAL WORLD</span>
             <div class="work-body">
             <h3>AI <span class="red">解决</span>方案</h3>
-            <p>豆包工作伙伴 &amp; 妙搭服务</p>
+            <p>豆包工作伙伴 &amp; AI 应用服务</p>
             </div>
             <span class="work-bottom">FROM POSSIBILITY TO PRACTICE</span>
           </div>
