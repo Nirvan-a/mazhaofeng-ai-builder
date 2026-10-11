@@ -176,6 +176,24 @@ document.querySelector('#app').innerHTML = `
 
 `;
 
+const brandLink = document.querySelector('.brand');
+let brandClickCount = 0;
+let lastBrandClickAt = 0;
+brandLink.addEventListener('click', (event) => {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  const now = performance.now();
+  brandClickCount = now - lastBrandClickAt <= 1200 ? brandClickCount + 1 : 1;
+  lastBrandClickAt = now;
+  if (brandClickCount < 5) return;
+
+  event.preventDefault();
+  brandClickCount = 0;
+  const target = new URL(location.href);
+  target.searchParams.set('view', 'analytics');
+  target.hash = '';
+  location.assign(target);
+});
+
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 function resetToHome() {
   history.replaceState(history.state, '', `${location.pathname}${location.search}#home`);

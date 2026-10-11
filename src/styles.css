@@ -39,7 +39,7 @@ main > .page:not(#home) { content-visibility: auto; contain-intrinsic-size: 100d
 
 .site-header { position: fixed; z-index: 30; inset: 0 0 auto; display: flex; align-items: center; gap: 30px; height: var(--header-h); padding-inline: var(--gutter); transition: background .3s, color .3s, box-shadow .3s; }
 .site-header.scrolled { background: rgb(238 236 231 / 97%); box-shadow: 0 1px var(--line); }
-.brand { flex-shrink: 0; font-size: 26px; font-weight: 850; letter-spacing: -.055em; }
+.brand { flex-shrink: 0; touch-action: manipulation; font-size: 26px; font-weight: 850; letter-spacing: -.055em; }
 .brand-note { padding-left: 26px; border-left: 1px solid var(--line); font: 10px/30px var(--mono); letter-spacing: .14em; color: #696761; }
 .brand-note i { padding-inline: 8px; font-style: normal; }
 .site-header nav { display: flex; gap: clamp(16px, 2vw, 32px); margin-left: auto; }
